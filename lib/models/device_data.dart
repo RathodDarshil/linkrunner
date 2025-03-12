@@ -19,6 +19,7 @@ Future<Map<String, dynamic>> getDeviceData() async {
 
   Map<String, dynamic> deviceData = {
     'application_name': packageInfo.appName,
+    'app_version': packageInfo.version,
     'build_number': packageInfo.buildNumber,
     'bundle_id': packageInfo.packageName,
     'connectivity': (connectivityResult.contains(ConnectivityResult.mobile))
