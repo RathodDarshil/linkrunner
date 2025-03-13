@@ -18,7 +18,7 @@ class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
   final String _baseUrl = 'https://api.linkrunner.io';
-  final String packageVersion = '0.7.9';
+  final String packageVersion = '1.0.0';
 
   String? token;
 
@@ -241,7 +241,8 @@ class LinkRunner {
         'install_instance_id': await getLinkRunnerInstallInstanceId(),
       });
 
-      var response = await http.post(setUserDataUrl, headers: jsonHeaders, body: body);
+      var response =
+          await http.post(setUserDataUrl, headers: jsonHeaders, body: body);
 
       var result = jsonDecode(response.body);
       if (response.statusCode != 200 && response.statusCode != 201) {
