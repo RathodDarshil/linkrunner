@@ -6,6 +6,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:android_play_install_referrer/android_play_install_referrer.dart';
+import 'package:advertising_id/advertising_id.dart';
 
 import '../constants.dart';
 
@@ -28,6 +29,17 @@ Future<Map<String, dynamic>> getDeviceData() async {
     'version': packageInfo.version,
   };
 
+  String? advertisingId;
+  try {
+    advertisingId = await AdvertisingId.id(true);
+    final bool? isLimitAdTrackingEnabled = await AdvertisingId.isLimitAdTrackingEnabled;
+    if (isLimitAdTrackingEnabled == true) {
+      advertisingId = null;
+    }
+  } catch(e) {
+    advertisingId = null;
+  }
+
   if (Platform.isAndroid) {
     AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
     deviceData.addAll({
@@ -40,6 +52,7 @@ Future<Map<String, dynamic>> getDeviceData() async {
       'device_type': androidInfo.type,
       'device_name': androidInfo.model,
       'manufacturer': androidInfo.manufacturer,
+      'gaid': advertisingId,
     });
 
     try {
@@ -59,6 +72,8 @@ Future<Map<String, dynamic>> getDeviceData() async {
       'device_model': iosInfo.model,
       'system_name': iosInfo.systemName,
       'system_version': iosInfo.systemVersion,
+      'idfa': advertisingId,
+      'idfv': iosInfo.identifierForVendor
     });
   }
 
