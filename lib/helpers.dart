@@ -25,3 +25,15 @@ String _generateRandomString(int length) {
   return String.fromCharCodes(List.generate(
       length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 }
+
+Future<void> setDeeplinkURL(String url) async {
+  const String key = 'linkrunner_deeplink_url';
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString(key, url);
+}
+
+Future<String?> getDeeplinkURL() async {
+  const String key = 'linkrunner_deeplink_url';
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString(key);
+}

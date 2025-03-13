@@ -18,7 +18,7 @@ class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
   final String _baseUrl = 'https://api.linkrunner.io';
-  final String packageVersion = '0.7.9';
+  final String packageVersion = '1.0.0';
 
   String? token;
 
@@ -71,6 +71,10 @@ class LinkRunner {
         name: packageName,
       );
 
+      if (result?['data']?['deeplink'] != null) {
+        await setDeeplinkURL(result['data']['deeplink']);
+      }
+
       if (result?['data'] != null) {
         return InitResponse.fromJSON(result?['data']);
       }
@@ -109,14 +113,13 @@ class LinkRunner {
     return await _initApiCall(null, null);
   }
 
-  Future<TriggerResponse?> trigger({
+  Future<TriggerResponse?> signup({
     required LRUserData userData,
     Map<String, dynamic>? data,
-    TriggerConfig? config,
   }) async {
     if (token == null) {
       developer.log(
-        'Trigger failed',
+        'Signup failed',
         name: packageName,
         error: Exception("linkrunner token not initialized"),
       );
@@ -147,7 +150,7 @@ class LinkRunner {
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         developer.log(
-          'Linkrunner: Trigger failed',
+          'Linkrunner: Signup failed',
           name: packageName,
           error: jsonEncode(result['msg']),
         );
@@ -158,51 +161,7 @@ class LinkRunner {
       if (result['data'] != null) {
         final data = TriggerResponse.fromJSON(result['data']);
 
-        bool shouldTrigger = data.deeplink != null &&
-            config?.triggerDeeplink != false &&
-            data.trigger != false;
-
-        if (shouldTrigger) {
-          developer.log(
-            'Linkrunner: Triggering deeplink > ${data.deeplink}',
-            name: packageName,
-          );
-
-          Uri deeplinkUrl = Uri.parse(data.deeplink ?? "");
-
-          try {
-            await launchUrl(deeplinkUrl);
-
-            Uri deeplinkTriggeredUri =
-                Uri.parse('$_baseUrl/api/client/deeplink-triggered');
-
-            final body = jsonEncode({
-              'token': token,
-              'device_data': await _getDeviceData(),
-              'install_instance_id': await getLinkRunnerInstallInstanceId(),
-            });
-
-            try {
-              await http.post(deeplinkTriggeredUri,
-                  headers: jsonHeaders, body: body);
-
-              developer.log(
-                'Linkrunner: Deeplink triggered successfully',
-                name: packageName,
-              );
-            } catch (e) {
-              developer.log(
-                'Linkrunner: Deeplink triggered failed',
-                error: e,
-                name: packageName,
-              );
-            }
-          } catch (e) {
-            // Nothing
-          }
-        }
-
-        developer.log('Linkrunner: Trigger called 🔥', name: packageName);
+        developer.log('Linkrunner: Signup called 🔥', name: packageName);
 
         return data;
       }
@@ -210,12 +169,96 @@ class LinkRunner {
       return null;
     } catch (e) {
       developer.log(
-        'Linkrunner: Trigger failed',
+        'Linkrunner: Signup failed',
         name: packageName,
         error: e,
       );
 
       return null;
+    }
+  }
+
+  Future<void> triggerDeeplink() async {
+    final deeplinkURL = await getDeeplinkURL();
+
+    if (deeplinkURL != null) {
+      Uri deeplinkUrl = Uri.parse(deeplinkURL);
+
+      try {
+        await launchUrl(deeplinkUrl);
+
+        Uri deeplinkTriggeredUri =
+            Uri.parse('$_baseUrl/api/client/deeplink-triggered');
+
+        final body = jsonEncode({
+          'token': token,
+          'device_data': await _getDeviceData(),
+          'install_instance_id': await getLinkRunnerInstallInstanceId(),
+          'platform': 'FLUTTER',
+        });
+
+        try {
+          await http.post(deeplinkTriggeredUri,
+              headers: jsonHeaders, body: body);
+
+          developer.log(
+            'Linkrunner: Deeplink triggered successfully',
+            name: packageName,
+          );
+        } catch (e) {
+          developer.log(
+            'Linkrunner: Deeplink triggered failed',
+            error: e,
+            name: packageName,
+          );
+        }
+      } catch (e) {
+        // Nothing
+      }
+    }
+  }
+
+  Future<void> setUserData({
+    required LRUserData userData,
+  }) async {
+    if (token == null) {
+      developer.log(
+        'Set user data failed',
+        name: packageName,
+        error: Exception("Linkrunner token not initialized"),
+      );
+      return;
+    }
+
+    try {
+      Uri setUserDataUrl = Uri.parse('$_baseUrl/api/client/set-user-data');
+
+      final body = jsonEncode({
+        'token': token,
+        'user_data': userData.toJSON(),
+        'platform': 'FLUTTER',
+        'device_data': await _getDeviceData(),
+        'install_instance_id': await getLinkRunnerInstallInstanceId(),
+      });
+
+      var response =
+          await http.post(setUserDataUrl, headers: jsonHeaders, body: body);
+
+      var result = jsonDecode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(result['msg']);
+      }
+
+      developer.log(
+        'Linkrunner: User data set successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: User data set failed',
+        error: e,
+        name: packageName,
+      );
     }
   }
 
@@ -321,6 +364,67 @@ class LinkRunner {
         name: packageName,
       );
 
+      return;
+    }
+  }
+
+  Future<void> trackEvent({
+    required String eventName,
+    Map<String, dynamic>? eventData,
+  }) async {
+    if (token == null) {
+      developer.log(
+        'Track event failed',
+        name: packageName,
+        error: Exception("Linkrunner token not initialized"),
+      );
+      return;
+    }
+
+    if (eventName.isEmpty) {
+      developer.log(
+        'Track event failed',
+        name: packageName,
+        error: Exception("Event name is required"),
+      );
+      return;
+    }
+
+    try {
+      Uri captureEventUrl = Uri.parse('$_baseUrl/api/client/capture-event');
+
+      final body = jsonEncode({
+        'token': token,
+        'event_name': eventName,
+        'event_data': eventData,
+        'platform': 'FLUTTER',
+        'device_data': await _getDeviceData(),
+        'install_instance_id': await getLinkRunnerInstallInstanceId(),
+      });
+
+      var response = await http.post(
+        captureEventUrl,
+        headers: jsonHeaders,
+        body: body,
+      );
+
+      var result = jsonDecode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(result['msg']);
+      }
+
+      developer.log(
+        'Linkrunner: Event tracked successfully > $eventName',
+        name: packageName,
+      );
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Error tracking event',
+        error: e,
+        name: packageName,
+      );
       return;
     }
   }

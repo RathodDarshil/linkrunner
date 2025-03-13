@@ -2,6 +2,22 @@
 
 Flutter Package for [linkrunner.io](https://www.linkrunner.io)
 
+## Table of Contents
+
+-   [Installation](#installation)
+    -   [Step 1: Installing linkrunner](#step-1-installing-linkrunner)
+    -   [Step 2: Android updates](#step-2-android-updates)
+-   [Usage](#usage)
+    -   [Initialisation](#initialisation)
+    -   [Signup](#signup)
+    -   [Set User Data](#set-user-data)
+    -   [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
+    -   [Track Event](#track-event)
+    -   [Capture revenue](#capture-revenue)
+    -   [Remove captured payment revenue](#remove-captured-payment-revenue)
+-   [Function Placement Guide](#function-placement-guide)
+-   [License](#license)
+
 ## Installation
 
 ### Step 1: Installing linkrunner
@@ -104,15 +120,15 @@ void main() async {
 }
 ```
 
-### Trigger
+### Signup
 
-Call this function once your onboarding is completed and the main stack is loaded
+Call this function only once after the user has completed the onboarding process in your app. This should be triggered at the final step of your onboarding flow to register the user with Linkrunner.
 
 ```dart
 import 'package:linkrunner/main.dart';
 
-void trigger() async {
-    final trigger = await linkrunner.trigger(
+void signup() async {
+    final signup = await linkrunner.signup(
         userData: LRUserData(
                 id: '1',
                 name: 'John Doe', // optional
@@ -120,18 +136,13 @@ void trigger() async {
                 email: 'support@linkrunner.io', //optional
             ),
         data: {}, // Any other data you might need
-        config: TriggerConfig(
-            triggerDeeplink: true // true by default
-        )
     );
   }
 ```
 
-By setting config > triggerDeeplink as `true` the deeplink won't be trigged (Only set to false if you are handling the redirection by yourself)
-
 You can pass any additional user related data in the `data` attribute
 
-#### Response type for `linkrunner.trigger`
+#### Response type for `linkrunner.signup`
 
 ```
 {
@@ -148,11 +159,56 @@ You can pass any additional user related data in the `data` attribute
   };
   deeplink: string;
   root_domain: boolean;
-  trigger: boolean; // Deeplink won't be triggered if false
 }
 ```
 
-Note: Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
+### Set User Data
+
+Call this function everytime the app is opened and the user is logged in.
+
+```dart
+import 'package:linkrunner/main.dart';
+
+void setUserData() async {
+    await linkrunner.setUserData(
+        userData: LRUserData(
+            id: '1',
+            name: 'John Doe', // optional
+            phone: '9583849238', // optional
+            email: 'support@linkrunner.io', //optional
+        ),
+    );
+}
+```
+
+### Trigger Deeplink (For Deferred Deep Linking)
+
+This function triggers the original deeplink that led to the app installation. Call it only after your main navigation is initialized and all deeplink-accessible screens are ready to receive navigation events.
+
+Note: For this to work properly make sure you have added verification objects on the [Linkrunner Dashboard](https://www.linkrunner.io/settings?sort_by=activity-1&s=store-verification).
+
+```dart
+import 'package:linkrunner/main.dart';
+
+void triggerDeeplink() async {
+    await linkrunner.triggerDeeplink();
+}
+```
+
+### Track Event
+
+Use this method to track custom events
+
+```dart
+import 'package:linkrunner/main.dart';
+
+void trackEvent() async {
+    await linkrunner.trackEvent(
+        eventName: 'event_name', // Name of the event
+        eventData: { 'key': 'value' } // Optional: Additional JSON data for the event
+    );
+}
+```
 
 ### Capture revenue
 
@@ -192,6 +248,20 @@ void removeCapturedPayment() async {
 ```
 
 NOTE: `userId` or `paymentId` is required in order to remove a payment entry, if you use userId all the payments attributed to that user will be removed
+
+### Function Placement Guide
+
+Below is a simple guide on where to place each function in your application:
+
+| Function                                                                    | Where to Place                                                         | When to Call                                             |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
+| [`linkrunner.init`](#initialisation)                                        | In your `main.dart` within a `WidgetsFlutterBinding.ensureInitialized` | Once when the app starts                                 |
+| [`linkrunner.signup`](#signup)                                              | In your onboarding flow                                                | Once after user completes the onboarding process         |
+| [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                           | Every time the app is opened and the user is logged in   |
+| [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                        | Once after your navigation is ready to handle deep links |
+| [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                    | When specific user actions or events occur               |
+| [`linkrunner.capturePayment`](#capture-revenue)                             | In your payment processing flow                                        | When a user makes a payment                              |
+| [`linkrunner.removePayment`](#remove-captured-payment-revenue)              | In your payment cancellation/refund flow                               | When a payment needs to be removed                       |
 
 ### Facing issues during integration?
 
