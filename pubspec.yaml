@@ -1,6 +1,6 @@
 name: linkrunner
 description: "Flutter Package for linkrunner, track every click, download and dropoff for your app links"
-version: 1.0.0
+version: 1.0.1
 homepage: "https://www.linkrunner.io/"
 repository: "https://github.com/RathodDarshil/linkrunner_flutter"
 documentation: "https://github.com/RathodDarshil/linkrunner_flutter#getting-started"
@@ -32,7 +32,6 @@ dev_dependencies:
     flutter_test:
         sdk: flutter
     flutter_lints: ^4.0.0
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
