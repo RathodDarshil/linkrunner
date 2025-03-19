@@ -134,6 +134,9 @@ void signup() async {
                 name: 'John Doe', // optional
                 phone: '9583849238', // optional
                 email: 'support@linkrunner.io', //optional
+                mixpanelDistinctId: '1234567890', // optional
+                amplitudeUserId: '1234567890', // optional
+                posthogDistinctId: '1234567890', // optional
             ),
         data: {}, // Any other data you might need
     );
@@ -176,6 +179,9 @@ void setUserData() async {
             name: 'John Doe', // optional
             phone: '9583849238', // optional
             email: 'support@linkrunner.io', //optional
+            mixpanelDistinctId: '1234567890', // optional
+            amplitudeUserId: '1234567890', // optional
+            posthogDistinctId: '1234567890', // optional
         ),
     );
 }
