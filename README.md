@@ -222,7 +222,9 @@ void capturePayment() async {
         capturePayment: LRCapturePayment(
             userId: '666',
             amount: 24168, // Send amount in one currency only
-            paymentId: 'AJKHAS' // optional but recommended
+            paymentId: 'AJKHAS', // optional but recommended
+            type: PaymentType.FIRST_PAYMENT, // optional
+            status: PaymentStatus.PAYMENT_COMPLETED, // optional
         ),
     );
   }
