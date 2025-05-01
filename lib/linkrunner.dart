@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io' show Platform;
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';
 import 'models/api.dart';
-
+import 'models/push_token.dart';
 import 'models/device_data.dart';
 import 'models/lr_user_data.dart';
 
@@ -39,11 +41,37 @@ class LinkRunner {
     return deviceData;
   }
 
+  Future<PushTokenInfo?> _getPushToken() async {
+    try {
+      // iOS: request permission before token fetch
+      if (Platform.isIOS) {
+        final settings = await FirebaseMessaging.instance.requestPermission();
+        
+        if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+            settings.authorizationStatus != AuthorizationStatus.provisional) {
+          return null;
+        }
+      }
+
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token == null) return null;
+
+      return PushTokenInfo(
+        token: token,
+        tokenType: Platform.isAndroid ? PushTokenType.FCM : PushTokenType.APN,
+      );
+    } catch (e) {
+      developer.log('Push-token fetch failed', error: e, name: packageName);
+      return null;
+    }
+  }
+
   Future<InitResponse?> _initApiCall(String? link, String? source) async {
     try {
       Uri initURL = Uri.parse('$_baseUrl/api/client/init');
 
       final deviceData = await _getDeviceData();
+      final pushTokenInfo = await _getPushToken();
 
       dynamic body = {
         'token': token,
@@ -53,6 +81,8 @@ class LinkRunner {
         'link': link,
         'source': source,
         'install_instance_id': await getLinkRunnerInstallInstanceId(),
+        'push_token': pushTokenInfo?.token,
+        'push_token_type': pushTokenInfo?.tokenType?.name,
       };
 
       var response = await http.post(
@@ -116,6 +146,8 @@ class LinkRunner {
   Future<TriggerResponse?> signup({
     required LRUserData userData,
     Map<String, dynamic>? data,
+    DateTime? userCreatedAt,
+    bool? isFirstTimeUser,
   }) async {
     if (token == null) {
       developer.log(
@@ -137,6 +169,8 @@ class LinkRunner {
         ...?data,
       },
       'install_instance_id': await getLinkRunnerInstallInstanceId(),
+      'customer_created_at': userCreatedAt?.toIso8601String(),
+      'is_first_time_customer': isFirstTimeUser,
     });
 
     try {
