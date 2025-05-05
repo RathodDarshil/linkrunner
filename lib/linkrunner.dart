@@ -43,23 +43,39 @@ class LinkRunner {
 
   Future<PushTokenInfo?> _getPushToken() async {
     try {
-      // iOS: request permission before token fetch
-      if (Platform.isIOS) {
-        final settings = await FirebaseMessaging.instance.requestPermission();
-        
-        if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-            settings.authorizationStatus != AuthorizationStatus.provisional) {
-          return null;
-        }
+      final settings = await FirebaseMessaging.instance.requestPermission();
+
+      if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+          settings.authorizationStatus != AuthorizationStatus.provisional) {
+        return null;
       }
 
-      final token = await FirebaseMessaging.instance.getToken();
-      if (token == null) return null;
+      final platform_os = Platform.isAndroid ? 'android' : 'ios';
 
-      return PushTokenInfo(
-        token: token,
-        tokenType: Platform.isAndroid ? PushTokenType.FCM : PushTokenType.APN,
-      );
+      if (platform_os == 'ios') {
+          String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          if (apnsToken != null) {
+            final fcmToken = await FirebaseMessaging.instance.getToken();
+            return PushTokenInfo(
+              fcmPushToken: fcmToken,
+              apnPushToken: apnsToken,
+              platformOS: platform_os,
+            );
+          }
+      }
+
+      else {
+          final token = await FirebaseMessaging.instance.getToken();
+          if (token == null) return null;
+
+          return PushTokenInfo(
+            fcmPushToken: token,
+            apnPushToken: '',
+            platformOS: platform_os,
+          );
+        }
+
+      return null;
     } catch (e) {
       developer.log('Push-token fetch failed', error: e, name: packageName);
       return null;
@@ -81,8 +97,9 @@ class LinkRunner {
         'link': link,
         'source': source,
         'install_instance_id': await getLinkRunnerInstallInstanceId(),
-        'push_token': pushTokenInfo?.token,
-        'push_token_type': pushTokenInfo?.tokenType?.name,
+        'fcm_push_token': pushTokenInfo?.fcmPushToken,
+        'apn_push_token': pushTokenInfo?.apnPushToken,
+        'platform_os': pushTokenInfo?.platformOS,
       };
 
       var response = await http.post(

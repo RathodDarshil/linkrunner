@@ -1,14 +1,12 @@
-enum PushTokenType {
-  FCM,
-  APN
-}
 
 class PushTokenInfo {
-  final String token;
-  final PushTokenType tokenType;
+  final String fcmPushToken;
+  final String apnPushToken;
+  final String platformOS;
 
   const PushTokenInfo({
-    required this.token,
-    required this.tokenType,
+    required this.fcmPushToken,
+    required this.apnPushToken,
+    required this.platformOS,
   });
 }
