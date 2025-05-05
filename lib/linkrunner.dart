@@ -58,7 +58,7 @@ class LinkRunner {
             final fcmToken = await FirebaseMessaging.instance.getToken();
             return PushTokenInfo(
               fcmPushToken: fcmToken,
-              apnPushToken: apnsToken,
+              apnsPushToken: apnsToken,
               platformOS: platform_os,
             );
           }
@@ -70,7 +70,7 @@ class LinkRunner {
 
           return PushTokenInfo(
             fcmPushToken: token,
-            apnPushToken: '',
+            apnsPushToken: '',
             platformOS: platform_os,
           );
         }
@@ -98,7 +98,7 @@ class LinkRunner {
         'source': source,
         'install_instance_id': await getLinkRunnerInstallInstanceId(),
         'fcm_push_token': pushTokenInfo?.fcmPushToken,
-        'apn_push_token': pushTokenInfo?.apnPushToken,
+        'apns_push_token': pushTokenInfo?.apnsPushToken,
         'platform_os': pushTokenInfo?.platformOS,
       };
 
