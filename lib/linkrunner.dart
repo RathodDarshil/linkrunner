@@ -50,32 +50,24 @@ class LinkRunner {
         return null;
       }
 
-      final platform_os = Platform.isAndroid ? 'android' : 'ios';
-
-      if (platform_os == 'ios') {
-          String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-          if (apnsToken != null) {
-            final fcmToken = await FirebaseMessaging.instance.getToken();
-            return PushTokenInfo(
-              fcmPushToken: fcmToken,
-              apnsPushToken: apnsToken,
-              platformOS: platform_os,
-            );
-          }
+      final platformOS = Platform.isAndroid ? 'android' : 'ios';
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      
+      if (fcmToken == null) return null;
+      
+      if (platformOS == 'ios') {
+        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        return PushTokenInfo(
+          fcmPushToken: fcmToken,
+          apnsPushToken: apnsToken,
+          platformOS: platformOS,
+        );
+      } else {
+        return PushTokenInfo(
+          fcmPushToken: fcmToken,
+          platformOS: platformOS,
+        );
       }
-
-      else {
-          final token = await FirebaseMessaging.instance.getToken();
-          if (token == null) return null;
-
-          return PushTokenInfo(
-            fcmPushToken: token,
-            apnsPushToken: '',
-            platformOS: platform_os,
-          );
-        }
-
-      return null;
     } catch (e) {
       developer.log('Push-token fetch failed', error: e, name: packageName);
       return null;
