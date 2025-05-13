@@ -62,11 +62,13 @@ class LinkRunner {
         String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
         if (apnsToken!=null){
           final fcmToken = await FirebaseMessaging.instance.getToken();
-          return PushTokenInfo(
-            fcmPushToken: fcmToken,
-            apnsPushToken: apnsToken,
-            platformOS: platformOS,
-          );
+          if (fcmToken!=null){
+            return PushTokenInfo(
+              fcmPushToken: fcmToken,
+              apnsPushToken: apnsToken,
+              platformOS: platformOS,
+            );
+          }
         }
       } else {
         final fcmToken = await FirebaseMessaging.instance.getToken();
@@ -77,6 +79,7 @@ class LinkRunner {
           );
         }
       }
+      return null;
     } catch (e) {
       developer.log('Push-token fetch failed', error: e, name: packageName);
       return null;
