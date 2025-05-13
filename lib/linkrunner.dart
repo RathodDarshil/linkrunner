@@ -34,6 +34,12 @@ class LinkRunner {
     try {
       deviceData = await getDeviceData();
       deviceData['version'] = packageVersion;
+      final pushTokenInfo = await _getPushToken();
+      if (pushTokenInfo != null) {
+        deviceData['fcm_push_token'] = pushTokenInfo.fcmPushToken;
+        deviceData['apns_push_token'] = pushTokenInfo.apnsPushToken;
+        deviceData['platform_os'] = pushTokenInfo.platformOS;
+      }
     } catch (e) {
       developer.log('Failed to get device info', error: e, name: packageName);
     }
@@ -82,7 +88,6 @@ class LinkRunner {
       Uri initURL = Uri.parse('$_baseUrl/api/client/init');
 
       final deviceData = await _getDeviceData();
-      final pushTokenInfo = await _getPushToken();
 
       dynamic body = {
         'token': token,
@@ -92,9 +97,6 @@ class LinkRunner {
         'link': link,
         'source': source,
         'install_instance_id': await getLinkRunnerInstallInstanceId(),
-        'fcm_push_token': pushTokenInfo?.fcmPushToken,
-        'apns_push_token': pushTokenInfo?.apnsPushToken,
-        'platform_os': pushTokenInfo?.platformOS,
       };
 
       var response = await http.post(
