@@ -3,12 +3,16 @@ class LRUserData {
   final String? name;
   final String? phone;
   final String? email;
+  final String? isFirstTimeUser;
+  final String? userCreatedAt;
 
   LRUserData({
     required this.id,
     required this.name,
     required this.phone,
     required this.email,
+    this.isFirstTimeUser,
+    this.userCreatedAt,
   });
 
   Map<String, String?> toJSON() {
@@ -17,6 +21,8 @@ class LRUserData {
       'name': name,
       'phone': phone,
       'email': email,
+      'is_first_time_user': isFirstTimeUser,
+      'user_created_at': userCreatedAt,
     };
   }
 }

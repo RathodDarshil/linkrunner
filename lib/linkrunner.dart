@@ -163,8 +163,6 @@ class LinkRunner {
   Future<TriggerResponse?> signup({
     required LRUserData userData,
     Map<String, dynamic>? data,
-    DateTime? userCreatedAt,
-    bool? isFirstTimeUser,
   }) async {
     if (token == null) {
       developer.log(
@@ -186,8 +184,6 @@ class LinkRunner {
         ...?data,
       },
       'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      'customer_created_at': userCreatedAt?.toIso8601String(),
-      'is_first_time_customer': isFirstTimeUser,
     });
 
     try {
