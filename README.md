@@ -124,6 +124,18 @@ void main() async {
 
 Call this function only once after the user has completed the onboarding process in your app. This should be triggered at the final step of your onboarding flow to register the user with Linkrunner.
 
+It is strongly recommended to use the platform’s identify function to set a persistent user_id once it becomes available (typically after signup or login).
+
+- [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+- [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+- [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+
+If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
+
+- mixpanel_distinct_id for Mixpanel
+- posthog_distinct_id for PostHog
+- amplitude_device_id for Amplitude
+
 ```dart
 import 'package:linkrunner/main.dart';
 
@@ -135,7 +147,7 @@ void signup() async {
                 phone: '9583849238', // optional
                 email: 'support@linkrunner.io', //optional
                 mixpanelDistinctId: '1234567890', // optional
-                amplitudeUserId: '1234567890', // optional
+                amplitudeDeviceId: '1234567890', // optional
                 posthogDistinctId: '1234567890', // optional
             ),
         data: {}, // Any other data you might need
@@ -180,7 +192,7 @@ void setUserData() async {
             phone: '9583849238', // optional
             email: 'support@linkrunner.io', //optional
             mixpanelDistinctId: '1234567890', // optional
-            amplitudeUserId: '1234567890', // optional
+            amplitudeDeviceId: '1234567890', // optional
             posthogDistinctId: '1234567890', // optional
         ),
     );
