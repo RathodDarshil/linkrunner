@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'dart:io' show Platform;
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';
 import 'models/api.dart';
-import 'models/push_token.dart';
 import 'models/device_data.dart';
 import 'models/lr_user_data.dart';
 
@@ -34,56 +31,11 @@ class LinkRunner {
     try {
       deviceData = await getDeviceData();
       deviceData['version'] = packageVersion;
-      final pushTokenInfo = await _getPushToken();
-      if (pushTokenInfo != null) {
-        deviceData['fcm_push_token'] = pushTokenInfo.fcmPushToken;
-        deviceData['apns_push_token'] = pushTokenInfo.apnsPushToken;
-        deviceData['platform_os'] = pushTokenInfo.platformOS;
-      }
     } catch (e) {
       developer.log('Failed to get device info', error: e, name: packageName);
     }
 
     return deviceData;
-  }
-
-  Future<PushTokenInfo?> _getPushToken() async {
-    try {
-      final settings = await FirebaseMessaging.instance.requestPermission();
-
-      if (settings.authorizationStatus != AuthorizationStatus.authorized &&
-          settings.authorizationStatus != AuthorizationStatus.provisional) {
-        return null;
-      }
-
-      final platformOS = Platform.isAndroid ? 'android' : 'ios';
-      
-      if (platformOS == 'ios') {
-        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        if (apnsToken!=null){
-          final fcmToken = await FirebaseMessaging.instance.getToken();
-          if (fcmToken!=null){
-            return PushTokenInfo(
-              fcmPushToken: fcmToken,
-              apnsPushToken: apnsToken,
-              platformOS: platformOS,
-            );
-          }
-        }
-      } else {
-        final fcmToken = await FirebaseMessaging.instance.getToken();
-        if (fcmToken != null) {
-          return PushTokenInfo(
-            fcmPushToken: fcmToken,
-            platformOS: platformOS,
-          );
-        }
-      }
-      return null;
-    } catch (e) {
-      developer.log('Push-token fetch failed', error: e, name: packageName);
-      return null;
-    }
   }
 
   Future<InitResponse?> _initApiCall(String? link, String? source) async {

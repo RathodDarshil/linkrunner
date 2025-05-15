@@ -27,8 +27,6 @@ dependencies:
     android_play_install_referrer: ^0.4.0
     shared_preferences: ^2.0.11
     advertising_id: ^2.7.1
-    firebase_core: ^3.13.0
-    firebase_messaging: ^15.2.5
 
 dev_dependencies:
     flutter_test:
