@@ -4,7 +4,7 @@ class LRUserData {
   final String? phone;
   final String? email;
   final String? mixpanelDistinctId;
-  final String? amplitudeUserId;
+  final String? amplitudeDeviceId;
   final String? posthogDistinctId;
 
   LRUserData({
@@ -13,7 +13,7 @@ class LRUserData {
     required this.phone,
     required this.email,
     this.mixpanelDistinctId,
-    this.amplitudeUserId,
+    this.amplitudeDeviceId,
     this.posthogDistinctId,
   });
 
@@ -24,7 +24,7 @@ class LRUserData {
       'phone': phone,
       'email': email,
       'mixpanel_distinct_id': mixpanelDistinctId,
-      'amplitude_user_id': amplitudeUserId,
+      'amplitude_device_id': amplitudeDeviceId,
       'posthog_distinct_id': posthogDistinctId,
     };
   }
