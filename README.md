@@ -191,9 +191,6 @@ void setUserData() async {
             name: 'John Doe', // optional
             phone: '9583849238', // optional
             email: 'support@linkrunner.io', //optional
-            mixpanelDistinctId: '1234567890', // optional
-            amplitudeDeviceId: '1234567890', // optional
-            posthogDistinctId: '1234567890', // optional
         ),
     );
 }
