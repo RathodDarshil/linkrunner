@@ -132,9 +132,9 @@ It is strongly recommended to use the platform’s identify function to set a pe
 
 If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
 
-- mixpanel_distinct_id for Mixpanel
-- posthog_distinct_id for PostHog
-- amplitude_device_id for Amplitude
+- mixpanelDistinctId for Mixpanel
+- posthogDistinctId for PostHog
+- amplitudeDeviceId for Amplitude
 
 ```dart
 import 'package:linkrunner/main.dart';
