@@ -134,6 +134,9 @@ void signup() async {
                 name: 'John Doe', // optional
                 phone: '9583849238', // optional
                 email: 'support@linkrunner.io', //optional
+                // These properties are used to track reinstalls
+                userCreatedAt: '2025-05-16T12:48:24.000Z', // optional
+                isFirstTimeUser: true, // optional
             ),
         data: {}, // Any other data you might need
     );
