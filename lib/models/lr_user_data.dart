@@ -3,12 +3,14 @@ class LRUserData {
   final String? name;
   final String? phone;
   final String? email;
+  final String? clevertapId;
 
   LRUserData({
     required this.id,
     required this.name,
     required this.phone,
     required this.email,
+    this.clevertapId,
   });
 
   Map<String, String?> toJSON() {
@@ -17,6 +19,7 @@ class LRUserData {
       'name': name,
       'phone': phone,
       'email': email,
+      'clevertap_id': clevertapId,
     };
   }
 }
