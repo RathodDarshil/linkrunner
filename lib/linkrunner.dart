@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
@@ -448,7 +449,7 @@ class LinkRunner {
         'integration_info': {
           'clevertap_id': clevertapId
         },
-        'platform': 'android'
+        'platform': Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'flutter')
       });
 
       var response = await http.post(
