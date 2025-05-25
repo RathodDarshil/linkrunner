@@ -428,4 +428,53 @@ class LinkRunner {
       return;
     }
   }
+
+  Future<void> setClevertapId(String clevertapId) async {
+    if (token == null) {
+      developer.log(
+        'Set Clevertap ID failed',
+        name: packageName,
+        error: Exception("Linkrunner token not initialized"),
+      );
+      return;
+    }
+
+    try {
+      Uri integrationsUrl = Uri.parse('$_baseUrl/api/client/integrations');
+
+      final body = jsonEncode({
+        'token': token,
+        'install_instance_id': await getLinkRunnerInstallInstanceId(),
+        'integration_info': {
+          'clevertap_id': clevertapId
+        },
+        'platform': 'android'
+      });
+
+      var response = await http.post(
+        integrationsUrl,
+        headers: jsonHeaders,
+        body: body,
+      );
+
+      var result = jsonDecode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(result['msg']);
+      }
+
+      developer.log(
+        'Linkrunner: Clevertap ID set successfully',
+        name: packageName,
+      );
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Error setting Clevertap ID',
+        error: e,
+        name: packageName,
+      );
+      return;
+    }
+  }
 }
