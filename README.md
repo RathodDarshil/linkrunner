@@ -135,7 +135,6 @@ void signup() async {
                 name: 'John Doe', // optional
                 phone: '9583849238', // optional
                 email: 'support@linkrunner.io', //optional
-                clevertapId: '123', // optional
             ),
         data: {}, // Any other data you might need
     );
