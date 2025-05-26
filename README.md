@@ -13,6 +13,7 @@ Flutter Package for [linkrunner.io](https://www.linkrunner.io)
     -   [Set User Data](#set-user-data)
     -   [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
     -   [Track Event](#track-event)
+    -   [Set Additional Data](#set-additional-data)
     -   [Capture revenue](#capture-revenue)
     -   [Remove captured payment revenue](#remove-captured-payment-revenue)
 -   [Function Placement Guide](#function-placement-guide)
@@ -124,6 +125,18 @@ void main() async {
 
 Call this function only once after the user has completed the onboarding process in your app. This should be triggered at the final step of your onboarding flow to register the user with Linkrunner.
 
+It is strongly recommended to use the platform’s identify function to set a persistent user_id once it becomes available (typically after signup or login).
+
+- [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+- [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+- [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+
+If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
+
+- mixpanelDistinctId for Mixpanel
+- posthogDistinctId for PostHog
+- amplitudeDeviceId for Amplitude
+
 ```dart
 import 'package:linkrunner/main.dart';
 
@@ -134,6 +147,9 @@ void signup() async {
                 name: 'John Doe', // optional
                 phone: '9583849238', // optional
                 email: 'support@linkrunner.io', //optional
+                mixpanelDistinctId: '1234567890', // optional
+                amplitudeDeviceId: '1234567890', // optional
+                posthogDistinctId: '1234567890', // optional
             ),
         data: {}, // Any other data you might need
     );
@@ -210,6 +226,23 @@ void trackEvent() async {
 }
 ```
 
+### Set Additional Data
+
+Use this method to set additional user identification data for analytics platforms
+
+```dart
+import 'package:linkrunner/main.dart';
+import 'package:linkrunner/models/integration_data.dart';
+
+void setAdditionalData() async {
+    await linkrunner.setAdditionalData(
+        IntegrationData(
+            clevertapId: 'CLEVERTAP_ID',
+        )
+    );
+}
+```
+
 ### Capture revenue
 
 Call this function after a payment is confirmed
@@ -260,6 +293,7 @@ Below is a simple guide on where to place each function in your application:
 | [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                           | Every time the app is opened and the user is logged in   |
 | [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                        | Once after your navigation is ready to handle deep links |
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                    | When specific user actions or events occur               |
+| [`linkrunner.setAdditionalData`](#set-additional-data)                     | After initialisation                                             | When you need to set or update integration platform IDs   |
 | [`linkrunner.capturePayment`](#capture-revenue)                             | In your payment processing flow                                        | When a user makes a payment                              |
 | [`linkrunner.removePayment`](#remove-captured-payment-revenue)              | In your payment cancellation/refund flow                               | When a payment needs to be removed                       |
 
