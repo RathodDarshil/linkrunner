@@ -13,6 +13,7 @@ import 'constants.dart';
 import 'models/api.dart';
 
 import 'models/device_data.dart';
+import 'models/integration_data.dart';
 import 'models/lr_user_data.dart';
 
 class LinkRunner {
@@ -472,6 +473,53 @@ class LinkRunner {
     } catch (e) {
       developer.log(
         'Error setting Clevertap ID',
+        error: e,
+        name: packageName,
+      );
+      return;
+    }
+  }
+
+  Future<void> setAdditionalData(IntegrationData integrationData) async {
+    if (token == null) {
+      developer.log(
+        'Set Additional Data failed',
+        name: packageName,
+        error: Exception("Linkrunner token not initialized"),
+      );
+      return;
+    }
+
+    try {
+      Uri integrationsUrl = Uri.parse('$_baseUrl/api/client/integrations');
+
+      final body = jsonEncode({
+        'token': token,
+        'install_instance_id': await getLinkRunnerInstallInstanceId(),
+        'integration_info': integrationData.toJSON(),
+        'platform': Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'flutter')
+      });
+
+      var response = await http.post(
+        integrationsUrl,
+        headers: jsonHeaders,
+        body: body,
+      );
+
+      var result = jsonDecode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(result['msg']);
+      }
+
+      developer.log(
+        'Linkrunner: Additional Data set successfully',
+        name: packageName,
+      );
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Error setting Additional Data',
         error: e,
         name: packageName,
       );

@@ -13,7 +13,7 @@ Flutter Package for [linkrunner.io](https://www.linkrunner.io)
     -   [Set User Data](#set-user-data)
     -   [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
     -   [Track Event](#track-event)
-    -   [Set Clevertap ID](#set-clevertap-id)
+    -   [Set Additional Data](#set-additional-data)
     -   [Capture revenue](#capture-revenue)
     -   [Remove captured payment revenue](#remove-captured-payment-revenue)
 -   [Function Placement Guide](#function-placement-guide)
@@ -212,6 +212,23 @@ void trackEvent() async {
 }
 ```
 
+### Set Additional Data
+
+Use this method to set additional user identification data for analytics platforms
+
+```dart
+import 'package:linkrunner/main.dart';
+import 'package:linkrunner/models/integration_data.dart';
+
+void setAdditionalData() async {
+    await linkrunner.setAdditionalData(
+        IntegrationData(
+            clevertapId: 'CLEVERTAP_ID',
+        )
+    );
+}
+```
+
 ### Capture revenue
 
 Call this function after a payment is confirmed
@@ -251,18 +268,6 @@ void removeCapturedPayment() async {
 
 NOTE: `userId` or `paymentId` is required in order to remove a payment entry, if you use userId all the payments attributed to that user will be removed
 
-### Set Clevertap ID
-
-Use this method to set a Clevertap ID for Clevertap integration
-
-```dart
-import 'package:linkrunner/main.dart';
-
-void setClevertapId() async {
-    await linkrunner.setClevertapId('CLVERTAP_ID'); // Pass the Clevertap ID as a string
-}
-```
-
 ### Function Placement Guide
 
 Below is a simple guide on where to place each function in your application:
@@ -274,7 +279,7 @@ Below is a simple guide on where to place each function in your application:
 | [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                           | Every time the app is opened and the user is logged in   |
 | [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                        | Once after your navigation is ready to handle deep links |
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                    | When specific user actions or events occur               |
-| [`linkrunner.setClevertapId`](#set-clevertap-id)                           | After initialisation                                             | When you need to set or update the Clevertap ID          |
+| [`linkrunner.setAdditionalData`](#set-additional-data)                     | After initialisation                                             | When you need to set or update integration platform IDs   |
 | [`linkrunner.capturePayment`](#capture-revenue)                             | In your payment processing flow                                        | When a user makes a payment                              |
 | [`linkrunner.removePayment`](#remove-captured-payment-revenue)              | In your payment cancellation/refund flow                               | When a payment needs to be removed                       |
 
