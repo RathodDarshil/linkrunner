@@ -77,7 +77,7 @@ You will need your [project token](https://www.linkrunner.io/dashboard?m=documen
 
 Place it in the `main` function:
 
-Note: The init call is now fire-and-forget. To get the attribution data and the deeplink use `getAttributionData`.
+Note: The init call does not return any value. To get the attribution data and the deeplink use `getAttributionData`.
 
 ```dart
 import 'package:linkrunner/main.dart';
