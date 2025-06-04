@@ -4,13 +4,12 @@ import 'dart:developer' as developer;
 import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
 import 'package:linkrunner/helpers.dart';
+import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_remove_payment.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';
-import 'models/api.dart';
-
 import 'models/device_data.dart';
 import 'models/lr_user_data.dart';
 
@@ -39,7 +38,48 @@ class LinkRunner {
     return deviceData;
   }
 
-  Future<InitResponse?> _initApiCall(String? link, String? source) async {
+  Future<AttributionData?> getAttributionData() async {
+    try {
+      if (token == null || token!.isEmpty) {
+        throw Exception('Linkrunner needs to be initialized with a token first!');
+      }
+
+      final url = Uri.parse('$_baseUrl/api/client/attribution-data');
+      final deviceData = await _getDeviceData();
+
+      final body = {
+        'token': token,
+        'package_version': packageVersion,
+        'device_data': deviceData,
+        'platform': 'FLUTTER',
+        'install_instance_id': await getLinkRunnerInstallInstanceId(),
+      };
+
+      final response = await http.post(
+        url,
+        headers: jsonHeaders,
+        body: jsonEncode(body),
+      );
+
+      final result = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw Exception(result['msg'] ?? 'Failed to get attribution data');
+      }
+
+      if (result['data'] == null) return null;
+      
+      return AttributionData.fromJSON(Map<String, dynamic>.from(result['data']));
+    } catch (e) {
+      developer.log(
+        'Error getting attribution data',
+        error: e,
+        name: packageName,
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> _initApiCall(String? link, String? source) async {
     try {
       Uri initURL = Uri.parse('$_baseUrl/api/client/init');
 
@@ -71,15 +111,7 @@ class LinkRunner {
         name: packageName,
       );
 
-      if (result?['data']?['deeplink'] != null) {
-        await setDeeplinkURL(result['data']['deeplink']);
-      }
-
-      if (result?['data'] != null) {
-        return InitResponse.fromJSON(result?['data']);
-      }
-
-      return null;
+      return;
     } catch (e) {
       developer.log(
         'Error initializing Linkrunner',
@@ -87,17 +119,17 @@ class LinkRunner {
         name: packageName,
       );
 
-      return null;
+      rethrow;
     }
   }
 
-  Future<InitResponse?> init(String token) async {
+  Future<void> init(String token) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
         name: packageName,
       );
-      return null;
+      throw Exception('Linkrunner needs your project token to initialize!');
     }
 
     final appLinks = AppLinks(); // AppLinks is singleton
@@ -109,11 +141,14 @@ class LinkRunner {
         _initApiCall(uri.toString(), "GENERAL");
       }
     });
-
-    return await _initApiCall(null, null);
+    try {
+      await _initApiCall(null, null);
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<TriggerResponse?> signup({
+  Future<void> signup({
     required LRUserData userData,
     Map<String, dynamic>? data,
   }) async {
@@ -123,7 +158,7 @@ class LinkRunner {
         name: packageName,
         error: Exception("linkrunner token not initialized"),
       );
-      return null;
+      throw Exception("linkrunner token not initialized");
     }
 
     Uri triggerUrl = Uri.parse('$_baseUrl/api/client/trigger');
@@ -158,15 +193,9 @@ class LinkRunner {
         throw Exception(result?.msg);
       }
 
-      if (result['data'] != null) {
-        final data = TriggerResponse.fromJSON(result['data']);
+      developer.log('Linkrunner: Signup called 🔥', name: packageName);
 
-        developer.log('Linkrunner: Signup called 🔥', name: packageName);
-
-        return data;
-      }
-
-      return null;
+      return;
     } catch (e) {
       developer.log(
         'Linkrunner: Signup failed',
@@ -174,7 +203,7 @@ class LinkRunner {
         error: e,
       );
 
-      return null;
+      rethrow;
     }
   }
 

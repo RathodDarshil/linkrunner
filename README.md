@@ -86,7 +86,7 @@ void main() async {
     // Call the .ensureInitialized method before calling the .init method
     WidgetsFlutterBinding.ensureInitialized();
 
-    final init = await lr.init("YOUR_PROJECT_TOKEN");
+    await lr.init("YOUR_PROJECT_TOKEN");
     runApp(MyApp());
 }
 ```
@@ -120,6 +120,48 @@ void main() async {
 }
 ```
 
+### Get Attribution Data
+
+Use this method to retrieve attribution data for the current installation. This can be called at any point after initialization to get information about the deeplink and campaign data.
+
+```dart
+import 'package:linkrunner/main.dart';
+
+void getAttribution() async {
+    try {
+        final attributionData = await linkrunner.getAttributionData();
+        if (attributionData != null) {
+            // Use the attribution data
+            print('Installation source: ${attributionData.attributionSource}');
+            print('Campaign name: ${attributionData.campaignData.name}');
+        }
+    } catch (e) {
+        // Handle error
+        print('Failed to get attribution data: $e');
+    }
+}
+```
+
+#### Response type for `linkrunner.getAttributionData`
+
+```dart
+{
+  deeplink: String,  // The deep link that led to the installation
+  attributionSource: String,  // Source of the attribution (e.g., 'ORGANIC', 'INORGANIC')
+  campaignData: {
+    id: String,  // Campaign ID
+    name: String,  // Campaign name
+    type: String,  // 'ORGANIC' or 'INORGANIC'
+    adNetwork: String?,  // e.g., 'META', 'GOOGLE', or null
+    groupName: String?,  // Ad group name or null
+    assetGroupName: String?,  // Asset group name or null
+    assetName: String?,  // Asset name or null
+    installedAt: String,  // ISO 8601 timestamp of installation
+    storeClickAt: String  // ISO 8601 timestamp of store click
+  }
+}
+```
+
 ### Signup
 
 Call this function only once after the user has completed the onboarding process in your app. This should be triggered at the final step of your onboarding flow to register the user with Linkrunner.
@@ -128,7 +170,7 @@ Call this function only once after the user has completed the onboarding process
 import 'package:linkrunner/main.dart';
 
 void signup() async {
-    final signup = await linkrunner.signup(
+    await linkrunner.signup(
         userData: LRUserData(
                 id: '1',
                 name: 'John Doe', // optional
@@ -138,29 +180,10 @@ void signup() async {
         data: {}, // Any other data you might need
     );
   }
-```
 
-You can pass any additional user related data in the `data` attribute
+You can pass any additional user related data in the `data` attribute. This method doesn't return any value but may throw exceptions if there's an error during the signup process.
 
-#### Response type for `linkrunner.signup`
-
-```
-{
-  ip_location_data: {
-    ip: string;
-    city: string;
-    countryLong: string;
-    countryShort: string;
-    latitude: number;
-    longitude: number;
-    region: string;
-    timeZone: string;
-    zipCode: string;
-  };
-  deeplink: string;
-  root_domain: boolean;
-}
-```
+Note: The signup process is now fire-and-forget. Handle any potential errors using try-catch blocks if needed.
 
 ### Set User Data
 
