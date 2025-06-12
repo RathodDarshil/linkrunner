@@ -10,6 +10,7 @@ Flutter Package for [linkrunner.io](https://www.linkrunner.io)
 -   [Usage](#usage)
     -   [Initialisation](#initialisation)
     -   [Signup](#signup)
+    -   [Get Attribution Data](#get-attribution-data)
     -   [Set User Data](#set-user-data)
     -   [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
     -   [Track Event](#track-event)
@@ -76,6 +77,8 @@ You will need your [project token](https://www.linkrunner.io/dashboard?m=documen
 
 Place it in the `main` function:
 
+Note: The init call does not return any value. To get the attribution data and the deeplink use `getAttributionData`.
+
 ```dart
 import 'package:linkrunner/main.dart';
 
@@ -86,37 +89,8 @@ void main() async {
     // Call the .ensureInitialized method before calling the .init method
     WidgetsFlutterBinding.ensureInitialized();
 
-    final init = await lr.init("YOUR_PROJECT_TOKEN");
+    await lr.init("YOUR_PROJECT_TOKEN");
     runApp(MyApp());
-}
-```
-
-#### Response type for `linkrunner.init`
-
-```
-{
-  ip_location_data: {
-    ip: string;
-    city: string;
-    countryLong: string;
-    countryShort: string;
-    latitude: number;
-    longitude: number;
-    region: string;
-    timeZone: string;
-    zipCode: string;
-  };
-  deeplink: string;
-  root_domain: boolean;
-  campaign_data: {
-    id: string;
-    name: string;
-    type: "ORGANIC" | "INORGANIC";
-    ad_network: "META" | "GOOGLE" | null;
-    group_name: string | null;
-    asset_group_name: string | null;
-    asset_name: string | null;
-  };
 }
 ```
 
@@ -128,7 +102,7 @@ Call this function only once after the user has completed the onboarding process
 import 'package:linkrunner/main.dart';
 
 void signup() async {
-    final signup = await linkrunner.signup(
+    await linkrunner.signup(
         userData: LRUserData(
                 id: '1',
                 name: 'John Doe', // optional
@@ -138,29 +112,53 @@ void signup() async {
         data: {}, // Any other data you might need
     );
   }
-```
-
-You can pass any additional user related data in the `data` attribute
-
-#### Response type for `linkrunner.signup`
 
 ```
-{
-  ip_location_data: {
-    ip: string;
-    city: string;
-    countryLong: string;
-    countryShort: string;
-    latitude: number;
-    longitude: number;
-    region: string;
-    timeZone: string;
-    zipCode: string;
-  };
-  deeplink: string;
-  root_domain: boolean;
+
+You can pass any additional user related data in the `data` attribute. This method doesn't return any value but may throw exceptions if there's an error during the signup process.
+
+### Get Attribution Data
+
+Use this method to retrieve attribution data for the current installation. This can be called at any point after initialization to get information about the deeplink and campaign data.
+
+```dart
+import 'package:linkrunner/main.dart';
+
+void getAttribution() async {
+    try {
+        final attributionData = await linkrunner.getAttributionData();
+        if (attributionData != null) {
+            // Use the attribution data
+            print('Installation source: ${attributionData.attributionSource}');
+            print('Campaign name: ${attributionData.campaignData.name}');
+        }
+    } catch (e) {
+        // Handle error
+        print('Failed to get attribution data: $e');
+    }
 }
 ```
+
+#### Response type for `linkrunner.getAttributionData`
+
+```dart
+{
+  deeplink: String,  // The deep link that led to the installation
+  attributionSource: String,  // Source of the attribution (e.g., 'ORGANIC', 'INORGANIC')
+  campaignData: {
+    id: String,  // Campaign ID
+    name: String,  // Campaign name
+    type: String,  // 'ORGANIC' or 'INORGANIC'
+    adNetwork: String?,  // e.g., 'META', 'GOOGLE', or null
+    groupName: String?,  // Ad group name or null
+    assetGroupName: String?,  // Asset group name or null
+    assetName: String?,  // Asset name or null
+    installedAt: String,  // ISO 8601 timestamp of installation
+    storeClickAt: String  // ISO 8601 timestamp of store click
+  }
+}
+```
+
 
 ### Set User Data
 
@@ -257,6 +255,7 @@ Below is a simple guide on where to place each function in your application:
 | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
 | [`linkrunner.init`](#initialisation)                                        | In your `main.dart` within a `WidgetsFlutterBinding.ensureInitialized` | Once when the app starts                                 |
 | [`linkrunner.signup`](#signup)                                              | In your onboarding flow                                                | Once after user completes the onboarding process         |
+| [`linkrunner.getAttributionData`](#get-attribution-data)                    | In the attribution handling logic                                      | Anytime you need attribution data and deeplink                       |
 | [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                           | Every time the app is opened and the user is logged in   |
 | [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                        | Once after your navigation is ready to handle deep links |
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                    | When specific user actions or events occur               |
