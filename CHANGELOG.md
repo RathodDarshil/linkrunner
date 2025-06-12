@@ -1,3 +1,3 @@
-## 0.7.9
+## 2.0.0
 
--   Flutter package for Linkrunner.io
+- Flutter package for Linkrunner.io
