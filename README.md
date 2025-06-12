@@ -4,20 +4,20 @@ Flutter Package for [linkrunner.io](https://www.linkrunner.io)
 
 ## Table of Contents
 
--   [Installation](#installation)
-    -   [Step 1: Installing linkrunner](#step-1-installing-linkrunner)
-    -   [Step 2: Android updates](#step-2-android-updates)
--   [Usage](#usage)
-    -   [Initialisation](#initialisation)
-    -   [Signup](#signup)
-    -   [Get Attribution Data](#get-attribution-data)
-    -   [Set User Data](#set-user-data)
-    -   [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
-    -   [Track Event](#track-event)
-    -   [Capture revenue](#capture-revenue)
-    -   [Remove captured payment revenue](#remove-captured-payment-revenue)
--   [Function Placement Guide](#function-placement-guide)
--   [License](#license)
+- [Installation](#installation)
+    - [Step 1: Installing linkrunner](#step-1-installing-linkrunner)
+    - [Step 2: Android updates](#step-2-android-updates)
+- [Usage](#usage)
+    - [Initialisation](#initialisation)
+    - [Signup](#signup)
+    - [Get Attribution Data](#get-attribution-data)
+    - [Set User Data](#set-user-data)
+    - [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
+    - [Track Event](#track-event)
+    - [Capture revenue](#capture-revenue)
+    - [Remove captured payment revenue](#remove-captured-payment-revenue)
+- [Function Placement Guide](#function-placement-guide)
+- [License](#license)
 
 ## Installation
 
@@ -64,6 +64,7 @@ dependencies {
 ### Step 3: IOS updates
 
 Add the following in `info.plist`:
+
 ```plist
 <key>NSUserTrackingUsageDescription</key>
 <string>This identifier will be used to deliver personalized ads to you.</string>
@@ -89,7 +90,7 @@ void main() async {
     // Call the .ensureInitialized method before calling the .init method
     WidgetsFlutterBinding.ensureInitialized();
 
-    await lr.init("YOUR_PROJECT_TOKEN");
+    lr.init("YOUR_PROJECT_TOKEN");
     runApp(MyApp());
 }
 ```
@@ -158,7 +159,6 @@ void getAttribution() async {
   }
 }
 ```
-
 
 ### Set User Data
 
@@ -255,7 +255,7 @@ Below is a simple guide on where to place each function in your application:
 | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
 | [`linkrunner.init`](#initialisation)                                        | In your `main.dart` within a `WidgetsFlutterBinding.ensureInitialized` | Once when the app starts                                 |
 | [`linkrunner.signup`](#signup)                                              | In your onboarding flow                                                | Once after user completes the onboarding process         |
-| [`linkrunner.getAttributionData`](#get-attribution-data)                    | In the attribution handling logic                                      | Anytime you need attribution data and deeplink                       |
+| [`linkrunner.getAttributionData`](#get-attribution-data)                    | In the attribution handling logic                                      | Anytime you need attribution data and deeplink           |
 | [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                           | Every time the app is opened and the user is logged in   |
 | [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                        | Once after your navigation is ready to handle deep links |
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                    | When specific user actions or events occur               |
