@@ -28,6 +28,15 @@ dependencies:
     shared_preferences: ^2.0.11
     advertising_id: ^2.7.1
 
+flutter:
+    plugin:
+        platforms:
+            android:
+                package: io.linkrunner.flutter
+                pluginClass: LinkrunnerPlugin
+            ios:
+                pluginClass: LinkrunnerPlugin
+
 dev_dependencies:
     flutter_test:
         sdk: flutter

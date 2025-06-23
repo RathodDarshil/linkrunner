@@ -1,12 +1,10 @@
 class AttributionData {
-  final String deeplink;
+  final String? deeplink;
   final CampaignData campaignData;
-  final String attributionSource;
 
   AttributionData({
-    required this.deeplink,
+    this.deeplink,
     required this.campaignData,
-    required this.attributionSource,
   });
 
   factory AttributionData.fromJSON(Map<String, dynamic>? json) {
@@ -14,9 +12,8 @@ class AttributionData {
       throw ArgumentError('JSON data cannot be null');
     }
     return AttributionData(
-      deeplink: json['deeplink'] as String? ?? '',
-      campaignData: CampaignData.fromJSON(json['campaign_data']),
-      attributionSource: json['attribution_source'] as String? ?? '',
+      deeplink: json['deeplink'] as String?,
+      campaignData: CampaignData.fromJSON(json['campaign_data'] as Map<String, dynamic>),
     );
   }
 
@@ -24,7 +21,6 @@ class AttributionData {
     return {
       'deeplink': deeplink,
       'campaign_data': campaignData.toJSON(),
-      'attribution_source': attributionSource,
     };
   }
 }
