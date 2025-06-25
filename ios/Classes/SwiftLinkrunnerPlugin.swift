@@ -68,7 +68,9 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                let userId = args["userId"] as? String,
                let amount = args["amount"] as? Double {
                 let paymentId = args["paymentId"] as? String
-                capturePayment(userId: userId, amount: amount, paymentId: paymentId, result: result)
+                let type = args["type"] as? String ?? "DEFAULT_PAYMENT"
+                let status = args["status"] as? String ?? "PAYMENT_COMPLETED"
+                capturePayment(userId: userId, amount: amount, paymentId: paymentId, type: type, status: status, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID and amount are required", details: nil))
             }
@@ -265,18 +267,24 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func capturePayment(userId: String, amount: Double, paymentId: String?, result: @escaping FlutterResult) {
+    private func capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
             return
         }
+        
+        // Convert string enum values to iOS SDK enum types
+        let paymentType = LinkrunnerKit.PaymentType(rawValue: type) ?? LinkrunnerKit.PaymentType.default
+        let paymentStatus = LinkrunnerKit.PaymentStatus(rawValue: status) ?? LinkrunnerKit.PaymentStatus.completed
         
         Task {
             do {
                 try await LinkrunnerSDK.shared.capturePayment(
                     amount: amount,
                     userId: userId,
-                    paymentId: paymentId
+                    paymentId: paymentId,
+                    type: paymentType,
+                    status: paymentStatus
                 )
                 DispatchQueue.main.async {
                     result(nil)

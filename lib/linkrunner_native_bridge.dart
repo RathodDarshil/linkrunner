@@ -180,8 +180,8 @@ class LinkRunnerNativeBridge {
         'userId': capturePayment.userId,
         'amount': capturePayment.amount,
         'paymentId': capturePayment.paymentId,
-        'type': capturePayment.type,
-        'status': capturePayment.status,
+        'type': capturePayment.type?.name ?? PaymentType.DEFAULT_PAYMENT.name,
+        'status': capturePayment.status?.name ?? PaymentStatus.PAYMENT_COMPLETED.name,
       };
       
       await _channel.invokeMethod('capturePayment', arguments);
