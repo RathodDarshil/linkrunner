@@ -18,7 +18,7 @@ import io.linkrunner.sdk.LinkRunner as NativeLinkRunner
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.request.CapturePaymentRequest
 import io.linkrunner.sdk.models.request.RemovePaymentRequest
-import io.linkrunner.sdk.models.request.IntegrationData
+import io.linkrunner.sdk.models.IntegrationData
 
 
 /** LinkrunnerPlugin */
@@ -171,29 +171,31 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 withContext(Dispatchers.Main) {
                     if (attributionDataResult.isSuccess) {
                         val attributionData = attributionDataResult.getOrNull()
-                        val resultMap = mutableMapOf<String, Any?>()
-                        attributionData?.let { data: io.linkrunner.sdk.models.response.AttributionData ->
-                            // Convert attribution data to a map that Flutter can understand
-                            // First include the response-level fields
-                          
-                            // Then include the AttributionData fields
-                            resultMap["deeplink"] = data.deeplink
+                        if (attributionData != null) {
+                            val resultMap = mutableMapOf<String, Any?>()
                             
-                            // Map campaign data using all fields from CampaignData
+                            // Include the AttributionData fields with proper null safety
+                            resultMap["deeplink"] = attributionData.deeplink
+                            
+                            // Map campaign data using all fields from CampaignData with null safety
                             val campaignMap = mutableMapOf<String, Any?>()
-                            campaignMap["id"] = data.campaignData.id
-                            campaignMap["name"] = data.campaignData.name
-                            campaignMap["ad_network"] = data.campaignData.adNetwork
-                            campaignMap["type"] = data.campaignData.type
-                            campaignMap["installed_at"] = data.campaignData.installedAt
-                            campaignMap["store_click_at"] = data.campaignData.storeClickAt
-                            campaignMap["group_name"] = data.campaignData.groupName
-                            campaignMap["asset_name"] = data.campaignData.assetName
-                            campaignMap["asset_group_name"] = data.campaignData.assetGroupName
+                            campaignMap["id"] = attributionData.campaignData.id
+                            campaignMap["name"] = attributionData.campaignData.name
+                            campaignMap["ad_network"] = attributionData.campaignData.adNetwork
+                            campaignMap["type"] = attributionData.campaignData.type
+                            campaignMap["installed_at"] = attributionData.campaignData.installedAt
+                            campaignMap["store_click_at"] = attributionData.campaignData.storeClickAt
+                            campaignMap["group_name"] = attributionData.campaignData.groupName
+                            campaignMap["asset_name"] = attributionData.campaignData.assetName
+                            campaignMap["asset_group_name"] = attributionData.campaignData.assetGroupName
                             
                             resultMap["campaign_data"] = campaignMap
+                            
+                            result.success(resultMap)
+                        } else {
+                            // Return empty map if attribution data is null
+                            result.success(mapOf<String, Any?>())
                         }
-                        result.success(resultMap)
                     } else {
                         val error = attributionDataResult.exceptionOrNull()
                         result.error("ATTRIBUTION_DATA_FAILED", 
@@ -269,7 +271,6 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                         result.error("SET_ADDITIONAL_DATA_FAILED", error?.message ?: "Set additional data failed", null)
                     }
                 }
-                result.success(null) // Temporary success response while code is commented
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     result.error("SET_ADDITIONAL_DATA_EXCEPTION", e.message, null)

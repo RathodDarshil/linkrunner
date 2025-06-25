@@ -42,6 +42,13 @@ class LinkRunnerNativeBridge {
       final result = await _channel.invokeMethod('getAttributionData');
       
       if (result == null) {
+        developer.log('Attribution data result is null', name: packageName);
+        return null;
+      }
+      
+      // Handle empty map case (when attribution data is not available)
+      if (result is Map && result.isEmpty) {
+        developer.log('Attribution data result is empty', name: packageName);
         return null;
       }
       
@@ -65,18 +72,20 @@ class LinkRunnerNativeBridge {
     if (input is Map) {
       final Map<String, dynamic> result = {};
       input.forEach((key, value) {
-        final String stringKey = key.toString();
-        if (value is Map) {
-          result[stringKey] = _convertToStringDynamicMap(value);
-        } else if (value is List) {
-          result[stringKey] = _convertList(value);
-        } else {
-          result[stringKey] = value;
+        if (key != null) {
+          final String stringKey = key.toString();
+          if (value is Map) {
+            result[stringKey] = _convertToStringDynamicMap(value);
+          } else if (value is List) {
+            result[stringKey] = _convertList(value);
+          } else {
+            result[stringKey] = value;
+          }
         }
       });
       return result;
     }
-    throw ArgumentError('Input must be a Map');
+    throw ArgumentError('Input must be a Map, got: ${input.runtimeType}');
   }
   
   /// Convert List elements recursively
