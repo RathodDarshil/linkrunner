@@ -316,6 +316,8 @@ class LinkRunner {
         'payment_id': capturePayment.paymentId,
         'user_id': capturePayment.userId,
         'amount': capturePayment.amount,
+        'type': capturePayment.type,
+        'status': capturePayment.status,
         'install_instance_id': await getLinkRunnerInstallInstanceId(),
       });
 
