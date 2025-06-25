@@ -12,9 +12,13 @@ class LinkRunnerNativeBridge {
   static const MethodChannel _channel = MethodChannel('linkrunner_native');
   
   /// Initialize the native SDK with project token
-  static Future<void> init(String token) async {
+  static Future<void> init(String token, String secretKey, String keyId) async {
     try {
-      var res = await _channel.invokeMethod('init', {'token': token});
+      var res = await _channel.invokeMethod('init', {
+        'token': token,
+        'secretKey': secretKey,
+        'keyId': keyId,
+      });
       developer.log(res.toString(), name: packageName);
       developer.log('Linkrunner initialized successfully 🔥', name: packageName);
     } on PlatformException catch (e) {
@@ -69,6 +73,22 @@ class LinkRunnerNativeBridge {
       developer.log('User data set successfully', name: packageName);
     } on PlatformException catch (e) {
       developer.log('Failed to set user data: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
+    }
+  }
+  
+  /// Set additional integration data
+  static Future<void> setAdditionalData({
+    required Map<String, dynamic> integrationData,
+  }) async {
+    try {
+      await _channel.invokeMethod('setAdditionalData', {
+        'integrationData': integrationData,
+      });
+      developer.log('Additional data set successfully', name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to set additional data: ${e.message}', 
           error: e, name: packageName);
       rethrow;
     }
@@ -168,6 +188,21 @@ class LinkRunnerNativeBridge {
       developer.log('Failed to get native SDK version: ${e.message}', 
           error: e, name: packageName);
       return null;
+    }
+  }
+
+  /// Enable or disable PII (Personally Identifiable Information) hashing
+  static Future<void> enablePIIHashing({required bool enabled}) async {
+    try {
+      await _channel.invokeMethod('enablePIIHashing', {
+        'enabled': enabled,
+      });
+      developer.log('PII hashing ${enabled ? 'enabled' : 'disabled'} successfully', 
+          name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to ${enabled ? 'enable' : 'disable'} PII hashing: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
     }
   }
 }

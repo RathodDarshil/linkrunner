@@ -18,8 +18,8 @@ import io.linkrunner.sdk.LinkRunner as NativeLinkRunner
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.request.CapturePaymentRequest
 import io.linkrunner.sdk.models.request.RemovePaymentRequest
-import io.linkrunner.sdk.models.response.InitResponse
-import io.linkrunner.sdk.models.response.TriggerResponse
+import io.linkrunner.sdk.models.request.IntegrationData
+
 
 /** LinkrunnerPlugin */
 class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
@@ -40,10 +40,12 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         when (call.method) {
             "init" -> {
                 val token = call.argument<String>("token")
-                if (token != null) {
-                    initNativeSDK(token, result)
+                val secretKey = call.argument<String>("secretKey")
+                val keyId = call.argument<String>("keyId")
+                if (token != null && secretKey != null && keyId != null) {
+                    initNativeSDK(token, secretKey, keyId, result)
                 } else {
-                    result.error("INVALID_ARGUMENT", "Token is required", null)
+                    result.error("INVALID_ARGUMENT", "Token, secretKey and keyId are required", null)
                 }
             }
             "getAttributionData" -> {
@@ -64,6 +66,14 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     setUserData(userData, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "User data is required", null)
+                }
+            }
+            "setAdditionalData" -> {
+                val IntegrationData = call.argument<Map<String, Any>>("IntegrationData")
+                if (IntegrationData != null) {
+                    setAdditionalData(IntegrationData, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "Integration data is required", null)
                 }
             }
             "triggerDeeplink" -> {
@@ -103,19 +113,27 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 // This matches the version from LinkRunner.kt
                 result.success("2.1.2")
             }
+            "enablePIIHashing" -> {
+                val enabled = call.argument<Boolean>("enabled")
+                if (enabled != null) {
+                    enablePIIHashing(enabled, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "enabled parameter is required", null)
+                }
+            }
             else -> {
                 result.notImplemented()
             }
         }
     }
 
-    private fun initNativeSDK(token: String, result: Result) {
+    private fun initNativeSDK(token: String, secretKey: String, keyId: String, result: Result) {
         pluginScope.launch {
             try {
                 val linkRunner = NativeLinkRunner.getInstance()
                 nativeLinkRunner = linkRunner
                 
-                val initResult = linkRunner.init(context, token)
+                val initResult = linkRunner.init(context, token, secretKey, keyId)
 
                 android.util.Log.d("LinkRunner", "Init result: $initResult")
                 android.util.Log.d("LinkRunner", "Is success: ${initResult.isSuccess}")
@@ -226,6 +244,32 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     result.error("SET_USER_DATA_EXCEPTION", e.message, null)
+                }
+            }
+        }
+    }
+
+    private fun setAdditionalData(IntegrationData: Map<String, Any>, result: Result) {
+        pluginScope.launch {
+            try {
+                val IntegrationDataModel = IntegrationData(
+                    clevertapId = IntegrationData["clevertap_id"] as? String
+                )
+                
+                val setAdditionalDataResult = NativeLinkRunner.getInstance().setAdditionalData(IntegrationDataModel)
+                
+                withContext(Dispatchers.Main) {
+                    if (setAdditionalDataResult.isSuccess) {
+                        result.success(null)
+                    } else {
+                        val error = setAdditionalDataResult.exceptionOrNull()
+                        result.error("SET_ADDITIONAL_DATA_FAILED", error?.message ?: "Set additional data failed", null)
+                    }
+                }
+                result.success(null) // Temporary success response while code is commented
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    result.error("SET_ADDITIONAL_DATA_EXCEPTION", e.message, null)
                 }
             }
         }
@@ -355,6 +399,15 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             userCreatedAt = userData["user_created_at"] as? String,
             isFirstTimeUser = userData["is_first_time_user"] as? Boolean
         )
+    }
+
+    private fun enablePIIHashing(enabled: Boolean, result: Result) {
+        try {
+            NativeLinkRunner.getInstance().enablePIIHashing(enabled)
+            result.success(null)
+        } catch (e: Exception) {
+            result.error("ENABLE_PII_HASHING_FAILED", e.message, null)
+        }
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {

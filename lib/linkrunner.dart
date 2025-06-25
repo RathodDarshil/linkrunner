@@ -39,35 +39,7 @@ class LinkRunner {
 
   Future<AttributionData?> getAttributionData() async {
     try {
-      if (token == null || token!.isEmpty) {
-        throw Exception('Linkrunner needs to be initialized with a token first!');
-      }
-
-      final url = Uri.parse('$_baseUrl/api/client/attribution-data');
-      final deviceData = await _getDeviceData();
-
-      final body = {
-        'token': token,
-        'package_version': packageVersion,
-        'device_data': deviceData,
-        'platform': 'FLUTTER',
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      };
-
-      final response = await http.post(
-        url,
-        headers: jsonHeaders,
-        body: jsonEncode(body),
-      );
-
-      final result = jsonDecode(response.body);
-      if (response.statusCode != 200) {
-        throw Exception(result['msg'] ?? 'Failed to get attribution data');
-      }
-
-      if (result['data'] == null) return null;
-      
-      return AttributionData.fromJSON(Map<String, dynamic>.from(result['data']));
+      return await LinkRunnerNativeBridge.getAttributionData();
     } catch (e) {
       developer.log(
         'Error getting attribution data',
@@ -78,7 +50,7 @@ class LinkRunner {
     }
   }
 
-  Future<void> init(String token) async {
+  Future<void> init(String token, String? secretKey, String? keyId) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
@@ -90,7 +62,7 @@ class LinkRunner {
     this.token = token;
     
     try {
-      await LinkRunnerNativeBridge.init(token);
+      await LinkRunnerNativeBridge.init(token, secretKey, keyId);
       developer.log('Using native SDK for init');
     } catch (e) {
       developer.log('Failed to initialize SDK: $e');
@@ -136,6 +108,27 @@ class LinkRunner {
         error: e,
       );
       return;
+    }
+  }
+
+  Future<void> setAdditionalData({
+    required Map<String, dynamic> integrationData,
+  }) async {
+    try {
+      await LinkRunnerNativeBridge.setAdditionalData(
+        integrationData: integrationData,
+      );
+
+      developer.log('Linkrunner: Additional data set successfully');
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Additional data set failed',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
     }
   }
 
@@ -193,6 +186,28 @@ class LinkRunner {
         error: e,
       );
 
+      rethrow;
+    }
+  }
+
+  /// Enable or disable PII (Personally Identifiable Information) hashing
+  /// When enabled, sensitive user data like name, email, and phone will be hashed using SHA-256
+  /// before being sent to the server
+  /// 
+  /// - Parameter enabled: Whether PII hashing should be enabled (defaults to true)
+  Future<void> enablePIIHashing([bool enabled = true]) async {
+    try {
+      await LinkRunnerNativeBridge.enablePIIHashing(enabled: enabled);
+      developer.log(
+        'Linkrunner: PII hashing ${enabled ? 'enabled' : 'disabled'} successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} PII hashing',
+        name: packageName,
+        error: e,
+      );
       rethrow;
     }
   }
