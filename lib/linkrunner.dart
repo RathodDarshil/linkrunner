@@ -50,7 +50,7 @@ class LinkRunner {
     }
   }
 
-  Future<void> init(String token, String? secretKey, String? keyId) async {
+  Future<void> init(String token, [String? secretKey, String? keyId]) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',

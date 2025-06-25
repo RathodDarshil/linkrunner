@@ -48,12 +48,7 @@ android {
     dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
         implementation 'io.flutter:flutter_embedding_debug:1.0.0-af51afceb8886cc5c5e2494c4fb6a355a0b4ca4e'
-        implementation 'io.linkrunner:android-sdk:2.0.1'
-        
-        // // Add local dependency to native Android SDK if available
-        // if (findProject(':linkrunner-android') != null) {
-        //     implementation project(':linkrunner-android')
-        // }
+        implementation 'io.linkrunner:android-sdk:2.1.3'
     }
 }
 

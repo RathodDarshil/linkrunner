@@ -42,10 +42,10 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 val token = call.argument<String>("token")
                 val secretKey = call.argument<String>("secretKey")
                 val keyId = call.argument<String>("keyId")
-                if (token != null && secretKey != null && keyId != null) {
+                if (token != null) {
                     initNativeSDK(token, secretKey, keyId, result)
                 } else {
-                    result.error("INVALID_ARGUMENT", "Token, secretKey and keyId are required", null)
+                    result.error("INVALID_ARGUMENT", "Token is required", null)
                 }
             }
             "getAttributionData" -> {
@@ -76,9 +76,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     result.error("INVALID_ARGUMENT", "Integration data is required", null)
                 }
             }
-            "triggerDeeplink" -> {
-                triggerDeeplink(result)
-            }
+
             "trackEvent" -> {
                 val eventName = call.argument<String>("eventName")
                 val eventData = call.argument<Map<String, Any>>("eventData")
@@ -127,13 +125,18 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun initNativeSDK(token: String, secretKey: String, keyId: String, result: Result) {
+    private fun initNativeSDK(token: String, secretKey: String?, keyId: String?, result: Result) {
         pluginScope.launch {
             try {
                 val linkRunner = NativeLinkRunner.getInstance()
                 nativeLinkRunner = linkRunner
                 
-                val initResult = linkRunner.init(context, token, secretKey, keyId)
+                // Call appropriate init method based on available parameters
+                val initResult = if (secretKey != null && keyId != null) {
+                    linkRunner.init(context, token, secretKey, keyId)
+                } else {
+                    linkRunner.init(context, token)
+                }
 
                 android.util.Log.d("LinkRunner", "Init result: $initResult")
                 android.util.Log.d("LinkRunner", "Is success: ${initResult.isSuccess}")
@@ -270,27 +273,6 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     result.error("SET_ADDITIONAL_DATA_EXCEPTION", e.message, null)
-                }
-            }
-        }
-    }
-
-    private fun triggerDeeplink(result: Result) {
-        pluginScope.launch {
-            try {
-                val triggerResult = NativeLinkRunner.getInstance().triggerDeeplink()
-                
-                withContext(Dispatchers.Main) {
-                    if (triggerResult.isSuccess) {
-                        result.success(null)
-                    } else {
-                        val error = triggerResult.exceptionOrNull()
-                        result.error("DEEPLINK_FAILED", error?.message ?: "Deeplink trigger failed", null)
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    result.error("DEEPLINK_EXCEPTION", e.message, null)
                 }
             }
         }

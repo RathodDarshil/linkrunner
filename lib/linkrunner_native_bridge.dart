@@ -12,13 +12,21 @@ class LinkRunnerNativeBridge {
   static const MethodChannel _channel = MethodChannel('linkrunner_native');
   
   /// Initialize the native SDK with project token
-  static Future<void> init(String token, String secretKey, String keyId) async {
+  static Future<void> init(String token, String? secretKey, String? keyId) async {
     try {
-      var res = await _channel.invokeMethod('init', {
+      final Map<String, dynamic> arguments = {
         'token': token,
-        'secretKey': secretKey,
-        'keyId': keyId,
-      });
+      };
+      
+      // Only include secretKey and keyId if they are provided
+      if (secretKey != null) {
+        arguments['secretKey'] = secretKey;
+      }
+      if (keyId != null) {
+        arguments['keyId'] = keyId;
+      }
+      
+      var res = await _channel.invokeMethod('init', arguments);
       developer.log(res.toString(), name: packageName);
       developer.log('Linkrunner initialized successfully 🔥', name: packageName);
     } on PlatformException catch (e) {
@@ -31,17 +39,57 @@ class LinkRunnerNativeBridge {
   /// Get attribution data from native SDK
   static Future<AttributionData?> getAttributionData() async {
     try {
-      final Map<dynamic, dynamic>? result = 
-          await _channel.invokeMethod('getAttributionData');
+      final result = await _channel.invokeMethod('getAttributionData');
       
-      if (result == null) return null;
+      if (result == null) {
+        return null;
+      }
       
-      return AttributionData.fromJSON(Map<String, dynamic>.from(result));
+      // Recursively convert the result to Map<String, dynamic>
+      final Map<String, dynamic> attributionMap = _convertToStringDynamicMap(result);
+      
+      return AttributionData.fromJSON(attributionMap);
     } on PlatformException catch (e) {
       developer.log('Failed to get attribution data: ${e.message}', 
           error: e, name: packageName);
       rethrow;
+    } catch (e) {
+      developer.log('Failed to parse attribution data: ${e.toString()}', 
+          error: e, name: packageName);
+      rethrow;
     }
+  }
+  
+  /// Recursively convert Map<Object?, Object?> to Map<String, dynamic>
+  static Map<String, dynamic> _convertToStringDynamicMap(dynamic input) {
+    if (input is Map) {
+      final Map<String, dynamic> result = {};
+      input.forEach((key, value) {
+        final String stringKey = key.toString();
+        if (value is Map) {
+          result[stringKey] = _convertToStringDynamicMap(value);
+        } else if (value is List) {
+          result[stringKey] = _convertList(value);
+        } else {
+          result[stringKey] = value;
+        }
+      });
+      return result;
+    }
+    throw ArgumentError('Input must be a Map');
+  }
+  
+  /// Convert List elements recursively
+  static List<dynamic> _convertList(List<dynamic> input) {
+    return input.map((item) {
+      if (item is Map) {
+        return _convertToStringDynamicMap(item);
+      } else if (item is List) {
+        return _convertList(item);
+      } else {
+        return item;
+      }
+    }).toList();
   }
   
   /// Trigger user signup event
@@ -89,18 +137,6 @@ class LinkRunnerNativeBridge {
       developer.log('Additional data set successfully', name: packageName);
     } on PlatformException catch (e) {
       developer.log('Failed to set additional data: ${e.message}', 
-          error: e, name: packageName);
-      rethrow;
-    }
-  }
-  
-  /// Trigger deeplink for deferred deep linking
-  static Future<void> triggerDeeplink() async {
-    try {
-      await _channel.invokeMethod('triggerDeeplink');
-      developer.log('Deeplink triggered successfully', name: packageName);
-    } on PlatformException catch (e) {
-      developer.log('Failed to trigger deeplink: ${e.message}', 
           error: e, name: packageName);
       rethrow;
     }
