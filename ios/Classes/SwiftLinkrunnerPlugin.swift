@@ -1,6 +1,6 @@
 import Flutter
 import UIKit
-import LinkrunneriOS
+import LinkrunnerKit
 
 @objc
 public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
