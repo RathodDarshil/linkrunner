@@ -128,7 +128,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func getAttributionData(result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
@@ -151,7 +151,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func signup(userData: [String: Any], data: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
@@ -185,7 +185,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func setUserData(userData: [String: Any], result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
@@ -220,7 +220,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func setAdditionalData(integrationData: [String: Any], result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
@@ -247,7 +247,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func trackEvent(eventName: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
@@ -269,7 +269,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
@@ -301,7 +301,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func removePayment(userId: String?, paymentId: String?, result: @escaping FlutterResult) {
         guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "Native SDK not initialized", details: nil))
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
         
