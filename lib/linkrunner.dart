@@ -1,23 +1,20 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:app_links/app_links.dart';
 import 'package:http/http.dart' as http;
-import 'package:linkrunner/helpers.dart';
 import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_remove_payment.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'constants.dart';
+import 'linkrunner_native_bridge.dart';
 import 'models/device_data.dart';
 import 'models/lr_user_data.dart';
 
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String _baseUrl = 'https://api.linkrunner.io';
-  final String packageVersion = '2.0.0';
+  final String packageVersion = '3.0.0';
 
   String? token;
 
@@ -40,35 +37,7 @@ class LinkRunner {
 
   Future<AttributionData?> getAttributionData() async {
     try {
-      if (token == null || token!.isEmpty) {
-        throw Exception('Linkrunner needs to be initialized with a token first!');
-      }
-
-      final url = Uri.parse('$_baseUrl/api/client/attribution-data');
-      final deviceData = await _getDeviceData();
-
-      final body = {
-        'token': token,
-        'package_version': packageVersion,
-        'device_data': deviceData,
-        'platform': 'FLUTTER',
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      };
-
-      final response = await http.post(
-        url,
-        headers: jsonHeaders,
-        body: jsonEncode(body),
-      );
-
-      final result = jsonDecode(response.body);
-      if (response.statusCode != 200) {
-        throw Exception(result['msg'] ?? 'Failed to get attribution data');
-      }
-
-      if (result['data'] == null) return null;
-      
-      return AttributionData.fromJSON(Map<String, dynamic>.from(result['data']));
+      return await LinkRunnerNativeBridge.getAttributionData();
     } catch (e) {
       developer.log(
         'Error getting attribution data',
@@ -79,51 +48,7 @@ class LinkRunner {
     }
   }
 
-  Future<void> _initApiCall(String? link, String? source) async {
-    try {
-      Uri initURL = Uri.parse('$_baseUrl/api/client/init');
-
-      final deviceData = await _getDeviceData();
-
-      dynamic body = {
-        'token': token,
-        'package_version': packageVersion,
-        'device_data': deviceData,
-        'platform': 'FLUTTER',
-        'link': link,
-        'source': source,
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      };
-
-      var response = await http.post(
-        initURL,
-        headers: jsonHeaders,
-        body: jsonEncode(body),
-      );
-
-      var result = jsonDecode(response.body);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(result['msg']);
-      }
-
-      developer.log(
-        'Linkrunner initialised successfully 🔥',
-        name: packageName,
-      );
-
-      return;
-    } catch (e) {
-      developer.log(
-        'Error initializing Linkrunner',
-        error: e,
-        name: packageName,
-      );
-
-      rethrow;
-    }
-  }
-
-  Future<void> init(String token) async {
+  Future<void> init(String token, [String? secretKey, String? keyId]) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
@@ -132,19 +57,13 @@ class LinkRunner {
       throw Exception('Linkrunner needs your project token to initialize!');
     }
 
-    final appLinks = AppLinks(); // AppLinks is singleton
-
     this.token = token;
-
-    appLinks.uriLinkStream.listen((uri) {
-      if (uri.queryParameters.containsKey('c')) {
-        _initApiCall(uri.toString(), "GENERAL");
-      }
-    });
+    
     try {
-      await _initApiCall(null, null);
+      await LinkRunnerNativeBridge.init(token, secretKey, keyId);
+      developer.log('Using native SDK for init');
     } catch (e) {
-      rethrow;
+      developer.log('Failed to initialize SDK: $e');
     }
   }
 
@@ -152,48 +71,12 @@ class LinkRunner {
     required LRUserData userData,
     Map<String, dynamic>? data,
   }) async {
-    if (token == null) {
-      developer.log(
-        'Signup failed',
-        name: packageName,
-        error: Exception("linkrunner token not initialized"),
-      );
-      throw Exception("linkrunner token not initialized");
-    }
-
-    Uri triggerUrl = Uri.parse('$_baseUrl/api/client/trigger');
-
-    final body = jsonEncode({
-      'token': token,
-      'user_data': userData.toJSON(),
-      'platform': 'FLUTTER',
-      'data': {
-        'device_data': await _getDeviceData(),
-        ...?data,
-      },
-      'install_instance_id': await getLinkRunnerInstallInstanceId(),
-    });
 
     try {
-      var response = await http.post(
-        triggerUrl,
-        headers: jsonHeaders,
-        body: body,
-      );
+      
+      await LinkRunnerNativeBridge.signup(userData: userData, data: data);
 
-      var result = jsonDecode(response.body);
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        developer.log(
-          'Linkrunner: Signup failed',
-          name: packageName,
-          error: jsonEncode(result['msg']),
-        );
-
-        throw Exception(result?.msg);
-      }
-
-      developer.log('Linkrunner: Signup called 🔥', name: packageName);
+      developer.log('Linkrunner: Signup called 🔥');
 
       return;
     } catch (e) {
@@ -207,139 +90,61 @@ class LinkRunner {
     }
   }
 
-  Future<void> triggerDeeplink() async {
-    final deeplinkURL = await getDeeplinkURL();
-
-    if (deeplinkURL != null) {
-      Uri deeplinkUrl = Uri.parse(deeplinkURL);
-
-      try {
-        await launchUrl(deeplinkUrl);
-
-        Uri deeplinkTriggeredUri =
-            Uri.parse('$_baseUrl/api/client/deeplink-triggered');
-
-        final body = jsonEncode({
-          'token': token,
-          'device_data': await _getDeviceData(),
-          'install_instance_id': await getLinkRunnerInstallInstanceId(),
-          'platform': 'FLUTTER',
-        });
-
-        try {
-          await http.post(deeplinkTriggeredUri,
-              headers: jsonHeaders, body: body);
-
-          developer.log(
-            'Linkrunner: Deeplink triggered successfully',
-            name: packageName,
-          );
-        } catch (e) {
-          developer.log(
-            'Linkrunner: Deeplink triggered failed',
-            error: e,
-            name: packageName,
-          );
-        }
-      } catch (e) {
-        // Nothing
-      }
-    }
-  }
-
   Future<void> setUserData({
     required LRUserData userData,
   }) async {
-    if (token == null) {
-      developer.log(
-        'Set user data failed',
-        name: packageName,
-        error: Exception("Linkrunner token not initialized"),
-      );
-      return;
-    }
-
     try {
-      Uri setUserDataUrl = Uri.parse('$_baseUrl/api/client/set-user-data');
+      await LinkRunnerNativeBridge.setUserData(userData: userData);
 
-      final body = jsonEncode({
-        'token': token,
-        'user_data': userData.toJSON(),
-        'platform': 'FLUTTER',
-        'device_data': await _getDeviceData(),
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      });
+      developer.log('Linkrunner: User data set successfully');
 
-      var response =
-          await http.post(setUserDataUrl, headers: jsonHeaders, body: body);
-
-      var result = jsonDecode(response.body);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(result['msg']);
-      }
-
-      developer.log(
-        'Linkrunner: User data set successfully',
-        name: packageName,
-      );
+      return;
     } catch (e) {
       developer.log(
         'Linkrunner: User data set failed',
-        error: e,
         name: packageName,
+        error: e,
       );
+      return;
+    }
+  }
+
+  Future<void> setAdditionalData({
+    required Map<String, dynamic> integrationData,
+  }) async {
+    try {
+      await LinkRunnerNativeBridge.setAdditionalData(
+        integrationData: integrationData,
+      );
+
+      developer.log('Linkrunner: Additional data set successfully');
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Additional data set failed',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
     }
   }
 
   Future<void> capturePayment({
     required LRCapturePayment capturePayment,
   }) async {
-    if (token == null) {
-      developer.log(
-        'Trigger failed',
-        name: packageName,
-        error: Exception("Linkrunner token not initialized"),
-      );
-
-      return;
-    }
-
     try {
-      Uri capturePaymentUrl = Uri.parse('$_baseUrl/api/client/capture-payment');
+      await LinkRunnerNativeBridge.capturePayment(capturePayment: capturePayment);
 
-      final body = jsonEncode({
-        'token': token,
-        'platform': 'FLUTTER',
-        'data': {
-          'device_data': await _getDeviceData(),
-        },
-        'payment_id': capturePayment.paymentId,
-        'user_id': capturePayment.userId,
-        'amount': capturePayment.amount,
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      });
-
-      var response =
-          await http.post(capturePaymentUrl, headers: jsonHeaders, body: body);
-
-      var result = jsonDecode(response.body);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(result['msg']);
-      }
-
-      developer.log(
-        'Linkrunner: Payment captured successfully 💸',
-        name: packageName,
-      );
+      developer.log('Linkrunner: Payment captured successfully 💸');
 
       return;
     } catch (e) {
       developer.log(
-        'Error capturing payment',
-        error: e,
+        'Linkrunner: Payment captured failed',
         name: packageName,
+        error: e,
       );
-
       return;
     }
   }
@@ -347,52 +152,16 @@ class LinkRunner {
   Future<void> removePayment({
     required LRRemovePayment removePayment,
   }) async {
-    if (token == null) {
-      developer.log(
-        'Trigger failed',
-        name: packageName,
-        error: Exception("Linkrunner token not initialized"),
-      );
-
-      return;
-    }
-
     try {
-      Uri capturePaymentUrl =
-          Uri.parse('$_baseUrl/api/client/remove-captured-payment');
-
-      final body = jsonEncode({
-        'token': token,
-        'platform': 'FLUTTER',
-        'data': {
-          'device_data': await _getDeviceData(),
-        },
-        'payment_id': removePayment.paymentId,
-        'user_id': removePayment.userId,
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      });
-
-      var response =
-          await http.post(capturePaymentUrl, headers: jsonHeaders, body: body);
-
-      var result = jsonDecode(response.body);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(result['msg']);
-      }
-
-      developer.log(
-        'Linkrunner: Payment entry removed successfully!',
-        name: packageName,
-      );
+      await LinkRunnerNativeBridge.removePayment(removePayment: removePayment);
 
       return;
     } catch (e) {
       developer.log(
-        'Error removing payment entry',
-        error: e,
+        'Linkrunner: Payment removed failed',
         name: packageName,
+        error: e,
       );
-
       return;
     }
   }
@@ -401,60 +170,43 @@ class LinkRunner {
     required String eventName,
     Map<String, dynamic>? eventData,
   }) async {
-    if (token == null) {
-      developer.log(
-        'Track event failed',
-        name: packageName,
-        error: Exception("Linkrunner token not initialized"),
-      );
-      return;
-    }
-
-    if (eventName.isEmpty) {
-      developer.log(
-        'Track event failed',
-        name: packageName,
-        error: Exception("Event name is required"),
-      );
-      return;
-    }
 
     try {
-      Uri captureEventUrl = Uri.parse('$_baseUrl/api/client/capture-event');
+      await LinkRunnerNativeBridge.trackEvent(eventName: eventName, eventData: eventData);
 
-      final body = jsonEncode({
-        'token': token,
-        'event_name': eventName,
-        'event_data': eventData,
-        'platform': 'FLUTTER',
-        'device_data': await _getDeviceData(),
-        'install_instance_id': await getLinkRunnerInstallInstanceId(),
-      });
-
-      var response = await http.post(
-        captureEventUrl,
-        headers: jsonHeaders,
-        body: body,
-      );
-
-      var result = jsonDecode(response.body);
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(result['msg']);
-      }
-
-      developer.log(
-        'Linkrunner: Event tracked successfully > $eventName',
-        name: packageName,
-      );
+      developer.log('Linkrunner: Event tracked successfully > $eventName');
 
       return;
     } catch (e) {
       developer.log(
-        'Error tracking event',
+        'Linkrunner: Event tracked failed',
+        name: packageName,
         error: e,
+      );
+
+      rethrow;
+    }
+  }
+
+  /// Enable or disable PII (Personally Identifiable Information) hashing
+  /// When enabled, sensitive user data like name, email, and phone will be hashed using SHA-256
+  /// before being sent to the server
+  /// 
+  /// - Parameter enabled: Whether PII hashing should be enabled (defaults to true)
+  Future<void> enablePIIHashing([bool enabled = true]) async {
+    try {
+      await LinkRunnerNativeBridge.enablePIIHashing(enabled: enabled);
+      developer.log(
+        'Linkrunner: PII hashing ${enabled ? 'enabled' : 'disabled'} successfully',
         name: packageName,
       );
-      return;
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} PII hashing',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
     }
   }
 }

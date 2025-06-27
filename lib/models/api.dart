@@ -1,13 +1,5 @@
 import 'ip_location_data.dart';
 
-class TriggerConfig {
-  final bool triggerDeeplink;
-
-  TriggerConfig({
-    required this.triggerDeeplink,
-  });
-}
-
 abstract class GeneralResponse {
   IPLocationData? ipLocationData;
   String? deeplink;
