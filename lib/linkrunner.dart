@@ -14,8 +14,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String _baseUrl = 'https://api.linkrunner.io';
-  final String packageVersion = '2.0.0';
+  final String packageVersion = '3.0.0';
 
   String? token;
 
