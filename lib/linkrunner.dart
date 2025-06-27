@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'dart:developer' as developer;
 
-import 'package:http/http.dart' as http;
 import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_remove_payment.dart';
 
 import 'constants.dart';
 import 'linkrunner_native_bridge.dart';
-import 'models/device_data.dart';
 import 'models/lr_user_data.dart';
 
 class LinkRunner {
@@ -21,19 +18,6 @@ class LinkRunner {
   LinkRunner._internal();
 
   factory LinkRunner() => _singleton;
-
-  Future<Map<String, dynamic>> _getDeviceData() async {
-    Map<String, dynamic> deviceData = {};
-
-    try {
-      deviceData = await getDeviceData();
-      deviceData['version'] = packageVersion;
-    } catch (e) {
-      developer.log('Failed to get device info', error: e, name: packageName);
-    }
-
-    return deviceData;
-  }
 
   Future<AttributionData?> getAttributionData() async {
     try {
