@@ -32,7 +32,7 @@ class LinkRunner {
     }
   }
 
-  Future<void> init(String token, [String? secretKey, String? keyId]) async {
+  Future<void> init(String token, [String? secretKey, String? keyId, bool debug = false]) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
@@ -44,8 +44,7 @@ class LinkRunner {
     this.token = token;
     
     try {
-      await LinkRunnerNativeBridge.init(token, secretKey, keyId);
-      developer.log('Using native SDK for init');
+      await LinkRunnerNativeBridge.init(token, secretKey, keyId, debug);
     } catch (e) {
       developer.log('Failed to initialize SDK: $e');
     }

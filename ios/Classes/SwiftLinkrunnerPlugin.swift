@@ -21,7 +21,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                let token = args["token"] as? String {
                 let secretKey = args["secretKey"] as? String
                 let keyId = args["keyId"] as? String
-                initNativeSDK(token: token, secretKey: secretKey, keyId: keyId, result: result)
+                let debug = args["debug"] as? Bool ?? false
+                initNativeSDK(token: token, secretKey: secretKey, keyId: keyId, debug: debug, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Token is required", details: nil))
             }
@@ -103,14 +104,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func initNativeSDK(token: String, secretKey: String?, keyId: String?, result: @escaping FlutterResult) {
+    private func initNativeSDK(token: String, secretKey: String?, keyId: String?, debug: Bool, result: @escaping FlutterResult) {
         Task {
             do {
                 // Call appropriate init method based on available parameters
                 if let secretKey = secretKey, let keyId = keyId {
-                    try await LinkrunnerSDK.shared.initialize(token: token, secretKey: secretKey, keyId: keyId)
+                    try await LinkrunnerSDK.shared.initialize(token: token, secretKey: secretKey, keyId: keyId, debug: debug)
                 } else {
-                    try await LinkrunnerSDK.shared.initialize(token: token)
+                    try await LinkrunnerSDK.shared.initialize(token: token, debug: debug)
                 }
                 isInitialized = true
                 DispatchQueue.main.async {
