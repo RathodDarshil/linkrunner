@@ -12,10 +12,11 @@ class LinkRunnerNativeBridge {
   static const MethodChannel _channel = MethodChannel('linkrunner_native');
   
   /// Initialize the native SDK with project token
-  static Future<void> init(String token, String? secretKey, String? keyId) async {
+  static Future<void> init(String token, String? secretKey, String? keyId, bool debug) async {
     try {
       final Map<String, dynamic> arguments = {
         'token': token,
+        'debug': debug,
       };
       
       // Only include secretKey and keyId if they are provided
