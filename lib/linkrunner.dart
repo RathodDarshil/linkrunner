@@ -44,7 +44,14 @@ class LinkRunner {
     this.token = token;
     
     try {
-      await LinkRunnerNativeBridge.init(token, secretKey, keyId, debug);
+      await LinkRunnerNativeBridge.init(
+        token,
+        secretKey,
+        keyId,
+        debug,
+        'FLUTTER',
+        packageVersion,
+      );
     } catch (e) {
       developer.log('Failed to initialize SDK: $e');
     }
