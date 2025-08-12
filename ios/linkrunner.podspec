@@ -13,7 +13,7 @@ user event tracking, and payment analytics for Flutter applications.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'LinkrunnerKit', '3.0.2'
+  s.dependency 'LinkrunnerKit', '3.0.1'
   s.platform = :ios, '15.0'
   s.swift_version = '5.9'
 
