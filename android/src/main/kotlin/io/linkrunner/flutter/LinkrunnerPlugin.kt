@@ -43,8 +43,10 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 val secretKey = call.argument<String>("secretKey")
                 val keyId = call.argument<String>("keyId")
                 val debug = call.argument<Boolean>("debug") ?: false
+                val platform = call.argument<String>("platform") ?: "FLUTTER"
+                val packageVersion = call.argument<String>("packageVersion")
                 if (token != null) {
-                    initNativeSDK(token, secretKey, keyId, debug, result)
+                    initNativeSDK(token, secretKey, keyId, debug, platform, packageVersion, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Token is required", null)
                 }
@@ -126,12 +128,32 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun initNativeSDK(token: String, secretKey: String?, keyId: String?, debug: Boolean, result: Result) {
+    private fun initNativeSDK(
+        token: String,
+        secretKey: String?,
+        keyId: String?,
+        debug: Boolean,
+        platform: String,
+        packageVersion: String?,
+        result: Result
+    ) {
         pluginScope.launch {
             try {
                 val linkRunner = NativeLinkRunner.getInstance()
                 nativeLinkRunner = linkRunner
                 
+                // Configure SDK with client platform and version prior to init
+                try {
+                    if (packageVersion != null) {
+                        NativeLinkRunner.configureSDK(platform, packageVersion)
+                    } else {
+                        // fallback when version is unavailable
+                        NativeLinkRunner.configureSDK(platform, "unknown")
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.w("LinkRunner", "configureSDK failed: ${'$'}{e.message}")
+                }
+
                 // Call appropriate init method based on available parameters
                 val initResult = if (secretKey != null && keyId != null) {
                     linkRunner.init(context, token, secretKey = secretKey, keyId = keyId, debug = debug)

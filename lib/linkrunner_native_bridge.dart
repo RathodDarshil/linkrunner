@@ -12,7 +12,15 @@ class LinkRunnerNativeBridge {
   static const MethodChannel _channel = MethodChannel('linkrunner_native');
   
   /// Initialize the native SDK with project token
-  static Future<void> init(String token, String? secretKey, String? keyId, bool debug) async {
+  /// Optionally pass the client SDK platform and version so native Android can be configured before init
+  static Future<void> init(
+    String token,
+    String? secretKey,
+    String? keyId,
+    bool debug, [
+    String platform = 'FLUTTER',
+    String? packageVersion,
+  ]) async {
     try {
       final Map<String, dynamic> arguments = {
         'token': token,
@@ -25,6 +33,11 @@ class LinkRunnerNativeBridge {
       }
       if (keyId != null) {
         arguments['keyId'] = keyId;
+      }
+      // Provide SDK platform and version so Android can call configureSDK before init
+      arguments['platform'] = platform;
+      if (packageVersion != null) {
+        arguments['packageVersion'] = packageVersion;
       }
       
       var res = await _channel.invokeMethod('init', arguments);
