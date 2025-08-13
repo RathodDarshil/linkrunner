@@ -11,7 +11,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.0.0';
+  final String packageVersion = '3.1.0';
 
   String? token;
 
@@ -32,7 +32,8 @@ class LinkRunner {
     }
   }
 
-  Future<void> init(String token, [String? secretKey, String? keyId, bool debug = false]) async {
+  Future<void> init(String token,
+      [String? secretKey, String? keyId, bool debug = false]) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
@@ -42,7 +43,7 @@ class LinkRunner {
     }
 
     this.token = token;
-    
+
     try {
       await LinkRunnerNativeBridge.init(
         token,
@@ -61,9 +62,7 @@ class LinkRunner {
     required LRUserData userData,
     Map<String, dynamic>? data,
   }) async {
-
     try {
-      
       await LinkRunnerNativeBridge.signup(userData: userData, data: data);
 
       developer.log('Linkrunner: Signup called 🔥');
@@ -124,7 +123,8 @@ class LinkRunner {
     required LRCapturePayment capturePayment,
   }) async {
     try {
-      await LinkRunnerNativeBridge.capturePayment(capturePayment: capturePayment);
+      await LinkRunnerNativeBridge.capturePayment(
+          capturePayment: capturePayment);
 
       developer.log('Linkrunner: Payment captured successfully 💸');
 
@@ -160,9 +160,9 @@ class LinkRunner {
     required String eventName,
     Map<String, dynamic>? eventData,
   }) async {
-
     try {
-      await LinkRunnerNativeBridge.trackEvent(eventName: eventName, eventData: eventData);
+      await LinkRunnerNativeBridge.trackEvent(
+          eventName: eventName, eventData: eventData);
 
       developer.log('Linkrunner: Event tracked successfully > $eventName');
 
@@ -181,7 +181,7 @@ class LinkRunner {
   /// Enable or disable PII (Personally Identifiable Information) hashing
   /// When enabled, sensitive user data like name, email, and phone will be hashed using SHA-256
   /// before being sent to the server
-  /// 
+  ///
   /// - Parameter enabled: Whether PII hashing should be enabled (defaults to true)
   Future<void> enablePIIHashing([bool enabled = true]) async {
     try {
