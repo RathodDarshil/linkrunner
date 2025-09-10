@@ -88,9 +88,6 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         case "isAvailable":
             result(isInitialized)
             
-        case "getVersion":
-            result("2.1.0") // iOS SDK version
-            
         case "enablePIIHashing":
             if let args = call.arguments as? [String: Any],
                let enabled = args["enabled"] as? Bool {

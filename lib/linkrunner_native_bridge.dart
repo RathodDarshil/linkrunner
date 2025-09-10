@@ -237,18 +237,6 @@ class LinkRunnerNativeBridge {
       return false;
     }
   }
-  
-  /// Get native SDK version
-  static Future<String?> getNativeSDKVersion() async {
-    try {
-      final String? version = await _channel.invokeMethod('getVersion');
-      return version;
-    } on PlatformException catch (e) {
-      developer.log('Failed to get native SDK version: ${e.message}', 
-          error: e, name: packageName);
-      return null;
-    }
-  }
 
   /// Enable or disable PII (Personally Identifiable Information) hashing
   static Future<void> enablePIIHashing({required bool enabled}) async {
