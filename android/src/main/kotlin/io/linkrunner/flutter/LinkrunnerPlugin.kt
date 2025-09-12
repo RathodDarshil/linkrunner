@@ -109,11 +109,6 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             "isAvailable" -> {
                 result.success(nativeLinkRunner != null)
             }
-            "getVersion" -> {
-                // Return the hardcoded SDK version since there's no accessor method
-                // This matches the version from LinkRunner.kt
-                result.success("2.1.2")
-            }
             "enablePIIHashing" -> {
                 val enabled = call.argument<Boolean>("enabled")
                 if (enabled != null) {
