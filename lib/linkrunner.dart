@@ -199,4 +199,29 @@ class LinkRunner {
       rethrow;
     }
   }
+
+  Future<void> setPushToken(String pushToken) async {
+    if (pushToken.isEmpty) {
+      developer.log(
+        'Linkrunner: Push token cannot be empty',
+        name: packageName,
+      );
+      throw Exception('Push token cannot be empty');
+    }
+
+    try {
+      await LinkRunnerNativeBridge.setPushToken(pushToken: pushToken);
+      developer.log(
+        'Linkrunner: Push token set successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to set push token',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
+    }
+  }
 }

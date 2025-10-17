@@ -252,4 +252,18 @@ class LinkRunnerNativeBridge {
       rethrow;
     }
   }
+
+  /// Set push notification token for the current user
+  static Future<void> setPushToken({required String pushToken}) async {
+    try {
+      await _channel.invokeMethod('setPushToken', {
+        'pushToken': pushToken,
+      });
+      developer.log('Push token set successfully', name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to set push token: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
+    }
+  }
 }

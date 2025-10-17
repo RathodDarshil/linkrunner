@@ -96,6 +96,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "enabled parameter is required", details: nil))
             }
             
+        case "setPushToken":
+            if let args = call.arguments as? [String: Any],
+               let pushToken = args["pushToken"] as? String {
+                setPushToken(pushToken: pushToken, result: result)
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "pushToken parameter is required", details: nil))
+            }
+            
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -324,6 +332,10 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func enablePIIHashing(enabled: Bool, result: @escaping FlutterResult) {
         LinkrunnerSDK.shared.enablePIIHashing(enabled)
+        result(nil)
+    }
+    
+    private func setPushToken(pushToken: String, result: @escaping FlutterResult) {
         result(nil)
     }
 }

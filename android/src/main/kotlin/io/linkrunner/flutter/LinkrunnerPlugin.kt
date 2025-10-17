@@ -117,6 +117,14 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     result.error("INVALID_ARGUMENT", "enabled parameter is required", null)
                 }
             }
+            "setPushToken" -> {
+                val pushToken = call.argument<String>("pushToken")
+                if (pushToken != null) {
+                    setPushToken(pushToken, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "pushToken parameter is required", null)
+                }
+            }
             else -> {
                 result.notImplemented()
             }
@@ -408,6 +416,32 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             result.success(null)
         } catch (e: Exception) {
             result.error("ENABLE_PII_HASHING_FAILED", e.message, null)
+        }
+    }
+
+    private fun setPushToken(pushToken: String, result: Result) {
+        if (pushToken.isBlank()) {
+            result.error("INVALID_ARGUMENT", "Push token cannot be empty", null)
+            return
+        }
+
+        pluginScope.launch {
+            try {
+                val setPushTokenResult = NativeLinkRunner.getInstance().setPushToken(pushToken)
+                
+                withContext(Dispatchers.Main) {
+                    if (setPushTokenResult.isSuccess) {
+                        result.success(null)
+                    } else {
+                        val error = setPushTokenResult.exceptionOrNull()
+                        result.error("SET_PUSH_TOKEN_FAILED", error?.message ?: "Set push token failed", null)
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    result.error("SET_PUSH_TOKEN_EXCEPTION", e.message, null)
+                }
+            }
         }
     }
 
