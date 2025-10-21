@@ -199,4 +199,34 @@ class LinkRunner {
       rethrow;
     }
   }
+
+  /// Set the push notification token for the current device
+  /// This enables LinkRunner to send push notifications to this device
+  ///
+  /// - Parameter pushToken: The push notification token from FCM (Android)
+  /// - Throws: Exception if the push token is empty or if setting the token fails
+  Future<void> setPushToken(String pushToken) async {
+    if (pushToken.isEmpty) {
+      developer.log(
+        'Linkrunner: Push token cannot be empty',
+        name: packageName,
+      );
+      throw Exception('Push token cannot be empty');
+    }
+
+    try {
+      await LinkRunnerNativeBridge.setPushToken(pushToken: pushToken);
+      developer.log(
+        'Linkrunner: Push token set successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to set push token',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
+    }
+  }
 }
