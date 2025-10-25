@@ -336,6 +336,24 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     }
     
     private func setPushToken(pushToken: String, result: @escaping FlutterResult) {
-        result(nil)
+        guard isInitialized else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
+            return
+        }
+        
+        Task {
+            do {
+                try await LinkrunnerSDK.shared.setPushToken(pushToken)
+                DispatchQueue.main.async {
+                    result(nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    result(FlutterError(code: "SET_PUSH_TOKEN_FAILED", 
+                                      message: error.localizedDescription, 
+                                      details: nil))
+                }
+            }
+        }
     }
 }
