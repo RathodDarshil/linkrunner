@@ -1,4 +1,4 @@
-## 3.2.0
+## 3.2.1
 
 -   Added `setPushToken()` function for push notification tracking
 -   Added Android backup configuration files for proper data handling
