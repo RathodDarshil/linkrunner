@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'linkrunner'
-  s.version          = '3.2.1'
+  s.version          = '3.4.0'
   s.summary          = 'Flutter Package for linkrunner, track every click, download and dropoff for your app links'
   s.description      = <<-DESC
 Flutter Package for linkrunner.io - Advanced app attribution and link tracking service. 
@@ -13,7 +13,7 @@ user event tracking, and payment analytics for Flutter applications.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'LinkrunnerKit', '3.2.1'
+  s.dependency 'LinkrunnerKit', '3.4.0'
   s.platform = :ios, '15.0'
   s.swift_version = '5.9'
 
