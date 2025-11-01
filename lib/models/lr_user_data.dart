@@ -7,7 +7,9 @@ class LRUserData {
   final bool? isFirstTimeUser; 
   final String? mixpanelDistinctId; 
   final String? amplitudeDeviceId; 
-  final String? posthogDistinctId; 
+  final String? posthogDistinctId;
+  final String? brazeDeviceId;
+  final String? gaAppInstanceId;
 
   LRUserData({
     required this.id,
@@ -19,6 +21,8 @@ class LRUserData {
     this.mixpanelDistinctId,
     this.amplitudeDeviceId,
     this.posthogDistinctId,
+    this.brazeDeviceId,
+    this.gaAppInstanceId,
   });
 
   Map<String, dynamic> toJSON() {
@@ -35,6 +39,8 @@ class LRUserData {
     if (mixpanelDistinctId != null) result['mixpanel_distinct_id'] = mixpanelDistinctId;
     if (amplitudeDeviceId != null) result['amplitude_device_id'] = amplitudeDeviceId;
     if (posthogDistinctId != null) result['posthog_distinct_id'] = posthogDistinctId;
+    if (brazeDeviceId != null) result['braze_device_id'] = brazeDeviceId;
+    if (gaAppInstanceId != null) result['ga_app_instance_id'] = gaAppInstanceId;
     
     return result;
   }
