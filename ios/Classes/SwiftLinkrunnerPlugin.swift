@@ -59,7 +59,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             if let args = call.arguments as? [String: Any],
                let eventName = args["eventName"] as? String {
                 let eventData = args["eventData"] as? [String: Any]
-                trackEvent(eventName: eventName, eventData: eventData, result: result)
+                let eventId = args["eventId"] as? String
+                trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Event name is required", details: nil))
             }
@@ -251,7 +252,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func trackEvent(eventName: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
+    private func trackEvent(eventName: String, eventData: [String: Any]?, eventId: String?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
@@ -259,7 +260,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         
         Task {
             do {
-                try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData)
+                try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId)
                 DispatchQueue.main.async {
                     result(nil)
                 }

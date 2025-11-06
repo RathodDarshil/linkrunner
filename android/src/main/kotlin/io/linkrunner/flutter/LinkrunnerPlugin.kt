@@ -83,8 +83,9 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             "trackEvent" -> {
                 val eventName = call.argument<String>("eventName")
                 val eventData = call.argument<Map<String, Any>>("eventData")
+                val eventId = call.argument<String?>("eventId")
                 if (eventName != null) {
-                    trackEvent(eventName, eventData, result)
+                    trackEvent(eventName, eventData, eventId, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Event name is required", null)
                 }
@@ -305,10 +306,10 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun trackEvent(eventName: String, eventData: Map<String, Any>?, result: Result) {
+    private fun trackEvent(eventName: String, eventData: Map<String, Any>?, eventId: String?, result: Result) {
         pluginScope.launch {
             try {
-                val trackResult = NativeLinkRunner.getInstance().trackEvent(eventName, eventData)
+                val trackResult = NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId)
                 
                 withContext(Dispatchers.Main) {
                     if (trackResult.isSuccess) {

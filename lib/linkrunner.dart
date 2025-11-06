@@ -159,10 +159,11 @@ class LinkRunner {
   Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
+    String? eventId,
   }) async {
     try {
       await LinkRunnerNativeBridge.trackEvent(
-          eventName: eventName, eventData: eventData);
+          eventName: eventName, eventData: eventData, eventId: eventId);
 
       developer.log('Linkrunner: Event tracked successfully > $eventName');
 
