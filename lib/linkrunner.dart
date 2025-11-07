@@ -156,10 +156,13 @@ class LinkRunner {
     }
   }
 
+
+  //  [eventId] - Optional event identifier. Accepts [String] or [num] (int/double).
+  //  Numbers will be automatically converted to strings.
   Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
-    dynamic eventId,
+    Object? eventId,
   }) async {
     try {
       String? convertedEventId;
