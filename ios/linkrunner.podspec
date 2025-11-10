@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'linkrunner'
-  s.version          = '3.2.3'
+  s.version          = '3.3.0'
   s.summary          = 'Flutter Package for linkrunner, track every click, download and dropoff for your app links'
   s.description      = <<-DESC
 Flutter Package for linkrunner.io - Advanced app attribution and link tracking service. 
