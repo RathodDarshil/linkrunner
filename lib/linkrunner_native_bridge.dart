@@ -169,12 +169,18 @@ class LinkRunnerNativeBridge {
   static Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
+    String? eventId,
   }) async {
+
     try {
       final Map<String, dynamic> arguments = {
         'eventName': eventName,
         'eventData': eventData ?? {},
       };
+      // Only include eventId if it is provided
+      if (eventId != null) {
+        arguments['eventId'] = eventId;
+      }
       
       await _channel.invokeMethod('trackEvent', arguments);
       developer.log('Event tracked successfully: $eventName', name: packageName);

@@ -156,13 +156,28 @@ class LinkRunner {
     }
   }
 
+
+  //  [eventId] - Optional event identifier. Accepts [String] or [num] (int/double).
+  //  Numbers will be automatically converted to strings.
   Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
+    Object? eventId,
   }) async {
     try {
+      String? convertedEventId;
+      if (eventId != null) {
+        if (eventId is num) {
+          convertedEventId = eventId.toString();
+        } else if (eventId is String) {
+          convertedEventId = eventId;
+        } else {
+          convertedEventId = null;
+        }
+      }
+      
       await LinkRunnerNativeBridge.trackEvent(
-          eventName: eventName, eventData: eventData);
+          eventName: eventName, eventData: eventData, eventId: convertedEventId);
 
       developer.log('Linkrunner: Event tracked successfully > $eventName');
 
