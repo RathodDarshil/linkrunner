@@ -1,3 +1,7 @@
+## 3.3.0
+
+-   Added Braze device ID and Google Analytics app instance ID fields to user data collection
+
 ## 3.2.1
 
 -   Added `setPushToken()` function for push notification tracking
