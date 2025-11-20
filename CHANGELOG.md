@@ -1,3 +1,7 @@
+## 3.4.0
+
+- Added support to pass disableIdfa flag to iOS SDK
+
 ## 3.3.0
 
 -   Added Braze device ID and Google Analytics app instance ID fields to user data collection
