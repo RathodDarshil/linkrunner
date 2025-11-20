@@ -33,7 +33,7 @@ class LinkRunner {
   }
 
   Future<void> init(String token,
-      [String? secretKey, String? keyId, bool debug = false]) async {
+      [String? secretKey, String? keyId, bool? disableIdfa, bool debug = false]) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
@@ -49,6 +49,7 @@ class LinkRunner {
         token,
         secretKey,
         keyId,
+        disableIdfa,
         debug,
         'FLUTTER',
         packageVersion,

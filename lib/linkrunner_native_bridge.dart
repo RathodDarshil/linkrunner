@@ -17,6 +17,7 @@ class LinkRunnerNativeBridge {
     String token,
     String? secretKey,
     String? keyId,
+    bool? disableIdfa,
     bool debug, [
     String platform = 'FLUTTER',
     String? packageVersion,
@@ -33,6 +34,9 @@ class LinkRunnerNativeBridge {
       }
       if (keyId != null) {
         arguments['keyId'] = keyId;
+      }
+      if (disableIdfa != null) {
+        arguments['disableIdfa'] = disableIdfa;
       }
       // Provide SDK platform and version so Android can call configureSDK before init
       arguments['platform'] = platform;
