@@ -1,3 +1,7 @@
+## 3.5.0
+
+- Added support to pass disableAaid flag to Android SDK
+
 ## 3.4.0
 
 - Added support to pass disableIdfa flag to iOS SDK

@@ -35,6 +35,7 @@ class LinkRunnerNativeBridge {
       if (keyId != null) {
         arguments['keyId'] = keyId;
       }
+      // iOS uses disableIdfa
       if (disableIdfa != null) {
         arguments['disableIdfa'] = disableIdfa;
       }
@@ -274,6 +275,36 @@ class LinkRunnerNativeBridge {
       developer.log('Failed to set push token: ${e.message}', 
           error: e, name: packageName);
       rethrow;
+    }
+  }
+
+  /// Disable AAID (Google Advertising ID) collection on Android
+  /// This is useful for apps targeting children or families to comply with Google Play's Family Policy
+  /// Note: This only affects Android. iOS uses disableIdfa parameter in init()
+  static Future<void> setDisableAaidCollection({required bool disabled}) async {
+    try {
+      await _channel.invokeMethod('setDisableAaidCollection', {
+        'disabled': disabled,
+      });
+      developer.log('AAID collection ${disabled ? 'disabled' : 'enabled'} successfully', 
+          name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to ${disabled ? 'disable' : 'enable'} AAID collection: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
+    }
+  }
+
+  /// Check if AAID collection is currently disabled (Android only)
+  /// Returns true if AAID collection is disabled, false otherwise
+  static Future<bool> isAaidCollectionDisabled() async {
+    try {
+      final bool result = await _channel.invokeMethod('isAaidCollectionDisabled');
+      return result;
+    } on PlatformException catch (e) {
+      developer.log('Failed to check AAID collection status: ${e.message}', 
+          error: e, name: packageName);
+      return false;
     }
   }
 }
