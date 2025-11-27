@@ -126,6 +126,17 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     result.error("INVALID_ARGUMENT", "pushToken parameter is required", null)
                 }
             }
+            "setDisableAaidCollection" -> {
+                val disabled = call.argument<Boolean>("disabled")
+                if (disabled != null) {
+                    setDisableAaidCollection(disabled, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "disabled parameter is required", null)
+                }
+            }
+            "isAaidCollectionDisabled" -> {
+                isAaidCollectionDisabled(result)
+            }
             else -> {
                 result.notImplemented()
             }
@@ -155,7 +166,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                         NativeLinkRunner.configureSDK(platform, "unknown")
                     }
                 } catch (e: Exception) {
-                    android.util.Log.w("LinkRunner", "configureSDK failed: ${'$'}{e.message}")
+                    android.util.Log.w("LinkRunner", "configureSDK failed: ${e.message}")
                 }
 
                 // Call appropriate init method based on available parameters
@@ -445,6 +456,25 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     result.error("SET_PUSH_TOKEN_EXCEPTION", e.message, null)
                 }
             }
+        }
+    }
+
+    private fun setDisableAaidCollection(disabled: Boolean, result: Result) {
+        try {
+            NativeLinkRunner.getInstance().setDisableAaidCollection(disabled)
+            android.util.Log.d("LinkRunner", "AAID collection ${if (disabled) "disabled" else "enabled"}")
+            result.success(null)
+        } catch (e: Exception) {
+            result.error("SET_DISABLE_AAID_FAILED", e.message, null)
+        }
+    }
+
+    private fun isAaidCollectionDisabled(result: Result) {
+        try {
+            val isDisabled = NativeLinkRunner.getInstance().isAaidCollectionDisabled()
+            result.success(isDisabled)
+        } catch (e: Exception) {
+            result.error("IS_AAID_COLLECTION_DISABLED_FAILED", e.message, null)
         }
     }
 

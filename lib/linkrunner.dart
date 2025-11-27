@@ -32,6 +32,15 @@ class LinkRunner {
     }
   }
 
+  /// Initialize the LinkRunner SDK
+  /// 
+  /// [token] - Your LinkRunner project token (required)
+  /// [secretKey] - Optional secret key for SDK signature
+  /// [keyId] - Optional key ID for SDK signature
+  /// [disableIdfa] - Disable IDFA collection on iOS (default: false)
+  /// [debug] - Enable debug mode (default: false)
+  /// 
+  /// Note: To disable AAID collection on Android, use setDisableAaidCollection() method
   Future<void> init(String token,
       [String? secretKey, String? keyId, bool disableIdfa = false, bool debug = false]) async {
     if (token.isEmpty) {
@@ -243,6 +252,46 @@ class LinkRunner {
         error: e,
       );
       rethrow;
+    }
+  }
+
+  /// Disable AAID (Google Advertising ID) collection on Android
+  /// When disabled, the SDK will not collect or send the Google Advertising ID (GAID).
+  /// This is useful for apps targeting children or families to comply with Google Play's Family Policy.
+  /// 
+  /// Note: This only affects Android. For iOS, use the disableIdfa parameter in init()
+  /// 
+  /// - Parameter disabled: Whether AAID collection should be disabled (default: true)
+  Future<void> setDisableAaidCollection([bool disabled = true]) async {
+    try {
+      await LinkRunnerNativeBridge.setDisableAaidCollection(disabled: disabled);
+      developer.log(
+        'Linkrunner: AAID collection ${disabled ? 'disabled' : 'enabled'} successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to ${disabled ? 'disable' : 'enable'} AAID collection',
+        name: packageName,
+        error: e,
+      );
+    }
+  }
+
+  /// Check if AAID (Google Advertising ID) collection is currently disabled on Android
+  /// Returns true if AAID collection is disabled, false otherwise
+  /// 
+  /// Note: This only affects Android. Always returns false on iOS.
+  Future<bool> isAaidCollectionDisabled() async {
+    try {
+      return await LinkRunnerNativeBridge.isAaidCollectionDisabled();
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to check AAID collection status',
+        name: packageName,
+        error: e,
+      );
+      return false;
     }
   }
 }
