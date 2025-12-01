@@ -1,3 +1,7 @@
+## 3.5.1
+
+- Removed unused dependencies and modules
+
 ## 3.5.0
 
 - Added support to pass disableAaid flag to Android SDK
