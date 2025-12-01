@@ -18,15 +18,6 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    device_info_plus: ^11.0.0
-    http: ^1.2.1
-    url_launcher: ^6.2.6
-    package_info_plus: ^8.0.0
-    connectivity_plus: ^6.0.3
-    app_links: ^6.1.4
-    android_play_install_referrer: ^0.4.0
-    shared_preferences: ^2.0.11
-    advertising_id: ^2.7.1
 
 flutter:
     plugin:
