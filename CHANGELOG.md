@@ -1,3 +1,7 @@
+## 3.6.0
+
+- Upgraded the native iOS version to support apple search ads attribution
+
 ## 3.5.1
 
 - Removed unused dependencies and modules
