@@ -1,3 +1,7 @@
+## 3.6.1
+
+- Upgraded the native android version to fix obfuscation errors due to TypeToken class
+
 ## 3.6.0
 
 - Upgraded the native iOS version to support apple search ads attribution
