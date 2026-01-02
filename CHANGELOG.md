@@ -1,3 +1,7 @@
+## 3.6.2
+
+- Added support for Meta view through attribution
+
 ## 3.6.1
 
 - Upgraded the native android version to fix obfuscation errors due to TypeToken class
