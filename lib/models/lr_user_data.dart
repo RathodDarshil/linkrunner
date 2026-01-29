@@ -10,6 +10,7 @@ class LRUserData {
   final String? posthogDistinctId;
   final String? brazeDeviceId;
   final String? gaAppInstanceId;
+  final String? gaSessionId;
 
   LRUserData({
     required this.id,
@@ -23,6 +24,7 @@ class LRUserData {
     this.posthogDistinctId,
     this.brazeDeviceId,
     this.gaAppInstanceId,
+    this.gaSessionId,
   });
 
   Map<String, dynamic> toJSON() {
@@ -41,6 +43,7 @@ class LRUserData {
     if (posthogDistinctId != null) result['posthog_distinct_id'] = posthogDistinctId;
     if (brazeDeviceId != null) result['braze_device_id'] = brazeDeviceId;
     if (gaAppInstanceId != null) result['ga_app_instance_id'] = gaAppInstanceId;
+    if (gaSessionId != null) result['ga_session_id'] = gaSessionId;
     
     return result;
   }
