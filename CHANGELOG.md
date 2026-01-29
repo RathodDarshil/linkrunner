@@ -1,3 +1,7 @@
+## 3.6.3
+
+- Added support for Google Analytics Session ID (gaSessionId) field in user data collection
+
 ## 3.6.2
 
 - Added support for Meta view through attribution
