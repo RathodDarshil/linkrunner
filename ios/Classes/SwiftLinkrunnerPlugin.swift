@@ -174,7 +174,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             amplitudeDeviceId: userData["amplitude_device_id"] as? String,
             posthogDistinctId: userData["posthog_distinct_id"] as? String,
             brazeDeviceId: userData["braze_device_id"] as? String,
-            gaAppInstanceId: userData["ga_app_instance_id"] as? String
+            gaAppInstanceId: userData["ga_app_instance_id"] as? String,
+            gaSessionId: userData["ga_session_id"] as? String
         )
         
         Task {
@@ -211,7 +212,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             amplitudeDeviceId: userData["amplitude_device_id"] as? String,
             posthogDistinctId: userData["posthog_distinct_id"] as? String,
             brazeDeviceId: userData["braze_device_id"] as? String,
-            gaAppInstanceId: userData["ga_app_instance_id"] as? String
+            gaAppInstanceId: userData["ga_app_instance_id"] as? String,
+            gaSessionId: userData["ga_session_id"] as? String
         )
         
         Task {
