@@ -22,6 +22,7 @@ class LRCapturePayment {
   final double amount;
   final PaymentType? type;
   final PaymentStatus? status;
+  final Map<String, dynamic>? eventData;
 
   LRCapturePayment({
     this.paymentId,
@@ -29,6 +30,7 @@ class LRCapturePayment {
     required this.amount,
     this.type,
     this.status,
+    this.eventData,
   });
 
   Map<String, dynamic> toJSON() {
@@ -41,6 +43,10 @@ class LRCapturePayment {
 
     if (paymentId != null) {
       json['payment_id'] = paymentId;
+    }
+
+    if (eventData != null) {
+      json['event_data'] = eventData;
     }
 
     return json;
