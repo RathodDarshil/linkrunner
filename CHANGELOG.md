@@ -1,3 +1,8 @@
+## 3.7.0
+
+- Added eventData parameter to capture payment method to support meta commerce event manager
+
+
 ## 3.6.3
 
 - Added support for Google Analytics Session ID (gaSessionId) field in user data collection
