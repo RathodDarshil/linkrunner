@@ -73,7 +73,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 let paymentId = args["paymentId"] as? String
                 let type = args["type"] as? String ?? "DEFAULT_PAYMENT"
                 let status = args["status"] as? String ?? "PAYMENT_COMPLETED"
-                capturePayment(userId: userId, amount: amount, paymentId: paymentId, type: type, status: status, result: result)
+                let eventData = args["eventData"] as? [String: Any]
+                capturePayment(userId: userId, amount: amount, paymentId: paymentId, type: type, status: status, eventData: eventData, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID and amount are required", details: nil))
             }
@@ -281,16 +282,16 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, result: @escaping FlutterResult) {
+    private func capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         // Convert string enum values to iOS SDK enum types
         let paymentType = LinkrunnerKit.PaymentType(rawValue: type) ?? LinkrunnerKit.PaymentType.default
         let paymentStatus = LinkrunnerKit.PaymentStatus(rawValue: status) ?? LinkrunnerKit.PaymentStatus.completed
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.capturePayment(
@@ -298,7 +299,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                     userId: userId,
                     paymentId: paymentId,
                     type: paymentType,
-                    status: paymentStatus
+                    status: paymentStatus,
+                    eventData: eventData
                 )
                 DispatchQueue.main.async {
                     result(nil)

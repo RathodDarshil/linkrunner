@@ -96,8 +96,9 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 val paymentId = call.argument<String>("paymentId")
                 val type = call.argument<String>("type") ?: "DEFAULT"
                 val status = call.argument<String>("status") ?: "PAYMENT_COMPLETED"
+                val eventData = call.argument<Map<String, Any>>("eventData")
                 if (userId != null && amount != null) {
-                    capturePayment(userId, amount, paymentId, type, status, result)
+                    capturePayment(userId, amount, paymentId, type, status, eventData, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "User ID and amount are required", null)
                 }
@@ -338,7 +339,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, result: Result) {
+    private fun capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, eventData: Map<String, Any>?, result: Result) {
         pluginScope.launch {
             try {
                 // Convert string to enum types
@@ -347,19 +348,20 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 } catch (e: IllegalArgumentException) {
                     io.linkrunner.sdk.models.PaymentType.DEFAULT
                 }
-                
+
                 val paymentStatus = try {
                     io.linkrunner.sdk.models.PaymentStatus.valueOf(status)
                 } catch (e: IllegalArgumentException) {
                     io.linkrunner.sdk.models.PaymentStatus.PAYMENT_COMPLETED
                 }
-                
+
                 val capturePaymentRequest = CapturePaymentRequest(
                     paymentId = paymentId ?: "",
                     userId = userId,
                     amount = amount,
                     type = paymentType,
-                    status = paymentStatus
+                    status = paymentStatus,
+                    eventData = eventData
                 )
                 
                 
