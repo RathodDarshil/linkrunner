@@ -11,6 +11,7 @@ class LRUserData {
   final String? brazeDeviceId;
   final String? gaAppInstanceId;
   final String? gaSessionId;
+  final String? netcoreDeviceGuid;
 
   LRUserData({
     required this.id,
@@ -25,6 +26,7 @@ class LRUserData {
     this.brazeDeviceId,
     this.gaAppInstanceId,
     this.gaSessionId,
+    this.netcoreDeviceGuid,
   });
 
   Map<String, dynamic> toJSON() {
@@ -44,6 +46,7 @@ class LRUserData {
     if (brazeDeviceId != null) result['braze_device_id'] = brazeDeviceId;
     if (gaAppInstanceId != null) result['ga_app_instance_id'] = gaAppInstanceId;
     if (gaSessionId != null) result['ga_session_id'] = gaSessionId;
+    if (netcoreDeviceGuid != null) result['netcore_device_guid'] = netcoreDeviceGuid;
     
     return result;
   }

@@ -1,3 +1,7 @@
+## 3.71.0
+
+- Added support for Netcore device GUID (netcoreDeviceGuid) field in user data collection
+
 ## 3.7.0
 
 - Added eventData parameter to capture payment method to support meta commerce event manager
