@@ -422,6 +422,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             brazeDeviceId = userData["braze_device_id"] as? String,
             gaAppInstanceId = userData["ga_app_instance_id"] as? String,
             gaSessionId = userData["ga_session_id"] as? String,
+            netcoreDeviceGuid = userData["netcore_device_guid"] as? String,
             userCreatedAt = userData["user_created_at"] as? String,
             isFirstTimeUser = userData["is_first_time_user"] as? Boolean
         )
