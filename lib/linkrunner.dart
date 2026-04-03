@@ -11,7 +11,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '3.8.0';
+  final String packageVersion = '3.9.0';
 
   String? token;
 
@@ -292,6 +292,36 @@ class LinkRunner {
         error: e,
       );
       return false;
+    }
+  }
+
+  /// Handle a deeplink for re-engagement attribution.
+  /// Call this method when the app is opened via a deeplink, regardless of app state.
+  ///
+  /// - Parameter deeplinkUrl: The full deeplink URL that opened the app
+  Future<void> handleDeeplink(String? deeplinkUrl) async {
+    // Handle null or empty URLs gracefully
+    if (deeplinkUrl == null || deeplinkUrl.isEmpty) {
+      developer.log(
+        'Linkrunner: handleDeeplink called with null or empty URL, ignoring',
+        name: packageName,
+      );
+      return;
+    }
+
+    try {
+      await LinkRunnerNativeBridge.handleDeeplink(deeplinkUrl: deeplinkUrl);
+      developer.log(
+        'Linkrunner: handleDeeplink successful for URL: $deeplinkUrl',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: handleDeeplink failed',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
     }
   }
 }

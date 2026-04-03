@@ -308,4 +308,19 @@ class LinkRunnerNativeBridge {
       return false;
     }
   }
+
+  /// Handle a deeplink for re-engagement attribution
+  /// Call this method when the app is opened via a deeplink, regardless of app state
+  static Future<void> handleDeeplink({required String deeplinkUrl}) async {
+    try {
+      await _channel.invokeMethod('handleDeeplink', {
+        'deeplinkUrl': deeplinkUrl,
+      });
+      developer.log('Deeplink handled successfully: $deeplinkUrl', name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to handle deeplink: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
+    }
+  }
 }

@@ -1,3 +1,7 @@
+## 3.9.0
+
+- Added `handleDeeplink()` method for re-engagement attribution tracking
+
 ## 3.8.0
 
 - Added support for Netcore device GUID (netcoreDeviceGuid) field in user data collection
