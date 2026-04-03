@@ -300,21 +300,13 @@ class LinkRunner {
   ///
   /// - Parameter deeplinkUrl: The full deeplink URL that opened the app
   Future<void> handleDeeplink(String? deeplinkUrl) async {
-    // Handle null or empty URLs gracefully
-    if (deeplinkUrl == null || deeplinkUrl.isEmpty) {
-      developer.log(
-        'Linkrunner: handleDeeplink called with null or empty URL, ignoring',
-        name: packageName,
-      );
+    // Handle null, empty, or whitespace-only URLs gracefully
+    if (deeplinkUrl == null || deeplinkUrl.trim().isEmpty) {
       return;
     }
 
     try {
       await LinkRunnerNativeBridge.handleDeeplink(deeplinkUrl: deeplinkUrl);
-      developer.log(
-        'Linkrunner: handleDeeplink successful for URL: $deeplinkUrl',
-        name: packageName,
-      );
     } catch (e) {
       developer.log(
         'Linkrunner: handleDeeplink failed',

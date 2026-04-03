@@ -498,6 +498,11 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             return
         }
 
+        if (nativeLinkRunner == null) {
+            result.error("NOT_INITIALIZED", "SDK not initialized", null)
+            return
+        }
+
         pluginScope.launch {
             try {
                 val handleDeeplinkResult = NativeLinkRunner.getInstance().handleDeeplink(deeplinkUrl)

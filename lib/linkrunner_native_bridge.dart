@@ -316,7 +316,6 @@ class LinkRunnerNativeBridge {
       await _channel.invokeMethod('handleDeeplink', {
         'deeplinkUrl': deeplinkUrl,
       });
-      developer.log('Deeplink handled successfully: $deeplinkUrl', name: packageName);
     } on PlatformException catch (e) {
       developer.log('Failed to handle deeplink: ${e.message}', 
           error: e, name: packageName);
