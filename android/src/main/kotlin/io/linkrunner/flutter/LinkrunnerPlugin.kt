@@ -509,7 +509,18 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 
                 withContext(Dispatchers.Main) {
                     if (handleDeeplinkResult.isSuccess) {
-                        result.success(null)
+                        val response = handleDeeplinkResult.getOrNull()
+                        if (response != null) {
+                            val resultMap = mutableMapOf<String, Any?>()
+                            val dataMap = mutableMapOf<String, Any?>()
+                            dataMap["is_linkrunner"] = response.isLinkrunner
+                            dataMap["deeplink"] = response.deeplink
+                            dataMap["processing"] = response.processing
+                            resultMap["data"] = dataMap
+                            result.success(resultMap)
+                        } else {
+                            result.success(mapOf<String, Any?>())
+                        }
                     } else {
                         val error = handleDeeplinkResult.exceptionOrNull()
                         result.error("HANDLE_DEEPLINK_FAILED", error?.message ?: "Handle deeplink failed", null)

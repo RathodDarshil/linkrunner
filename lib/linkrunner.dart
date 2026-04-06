@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_remove_payment.dart';
+import 'package:linkrunner/models/deeplink_data.dart';
 
 import 'constants.dart';
 import 'linkrunner_native_bridge.dart';
@@ -296,17 +297,18 @@ class LinkRunner {
   }
 
   /// Handle a deeplink for re-engagement attribution.
-  /// Call this method when the app is opened via a deeplink, regardless of app state.
+  /// Call this method when the app is opened via a deeplink.
   ///
   /// - Parameter deeplinkUrl: The full deeplink URL that opened the app
-  Future<void> handleDeeplink(String? deeplinkUrl) async {
+  /// - Returns: [DeeplinkData] with attribution info, or null for invalid input
+  Future<DeeplinkData?> handleDeeplink(String? deeplinkUrl) async {
     // Handle null, empty, or whitespace-only URLs gracefully
     if (deeplinkUrl == null || deeplinkUrl.trim().isEmpty) {
-      return;
+      return null;
     }
 
     try {
-      await LinkRunnerNativeBridge.handleDeeplink(deeplinkUrl: deeplinkUrl);
+      return await LinkRunnerNativeBridge.handleDeeplink(deeplinkUrl: deeplinkUrl);
     } catch (e) {
       developer.log(
         'Linkrunner: handleDeeplink failed',
