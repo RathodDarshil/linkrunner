@@ -4,6 +4,7 @@ import 'models/attribution_data.dart';
 import 'models/lr_capture_payment.dart';
 import 'models/lr_remove_payment.dart';
 import 'models/lr_user_data.dart';
+import 'models/deeplink_data.dart';
 import 'constants.dart';
 
 /// Native bridge for LinkRunner SDK
@@ -306,6 +307,27 @@ class LinkRunnerNativeBridge {
       developer.log('Failed to check AAID collection status: ${e.message}', 
           error: e, name: packageName);
       return false;
+    }
+  }
+
+  /// Handle a deeplink for re-engagement attribution
+  /// Call this method when the app is opened via a deeplink, regardless of app state
+  static Future<DeeplinkData?> handleDeeplink({required String deeplinkUrl}) async {
+    try {
+      final result = await _channel.invokeMethod('handleDeeplink', {
+        'deeplinkUrl': deeplinkUrl,
+      });
+
+      if (result == null || (result is Map && result.isEmpty)) {
+        return null;
+      }
+
+      final Map<String, dynamic> resultMap = _convertToStringDynamicMap(result);
+      return DeeplinkData.fromJSON(resultMap);
+    } on PlatformException catch (e) {
+      developer.log('Failed to handle deeplink: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
     }
   }
 }

@@ -107,6 +107,15 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "pushToken parameter is required", details: nil))
             }
             
+        case "handleDeeplink":
+            if let args = call.arguments as? [String: Any],
+               let deeplinkUrl = args["deeplinkUrl"] as? String {
+                handleDeeplink(deeplinkUrl: deeplinkUrl, result: result)
+            } else {
+                // Handle empty URL gracefully (matches SDK behavior)
+                result(nil)
+            }
+            
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -362,6 +371,34 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } catch {
                 DispatchQueue.main.async {
                     result(FlutterError(code: "SET_PUSH_TOKEN_FAILED", 
+                                      message: error.localizedDescription, 
+                                      details: nil))
+                }
+            }
+        }
+    }
+    
+    private func handleDeeplink(deeplinkUrl: String, result: @escaping FlutterResult) {
+        // Handle empty URL gracefully (matches SDK behavior)
+        if deeplinkUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            result(nil)
+            return
+        }
+        
+        guard isInitialized else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
+            return
+        }
+        
+        Task {
+            do {
+                let response = try await LinkrunnerSDK.shared.handleDeeplink(url: deeplinkUrl)
+                DispatchQueue.main.async {
+                    result(["data": response.toDictionary()])
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    result(FlutterError(code: "HANDLE_DEEPLINK_FAILED", 
                                       message: error.localizedDescription, 
                                       details: nil))
                 }

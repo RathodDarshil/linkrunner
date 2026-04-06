@@ -138,6 +138,15 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             "isAaidCollectionDisabled" -> {
                 isAaidCollectionDisabled(result)
             }
+            "handleDeeplink" -> {
+                val deeplinkUrl = call.argument<String>("deeplinkUrl")
+                if (deeplinkUrl != null) {
+                    handleDeeplink(deeplinkUrl, result)
+                } else {
+                    // Handle empty URL gracefully (matches SDK behavior)
+                    result.success(null)
+                }
+            }
             else -> {
                 result.notImplemented()
             }
@@ -479,6 +488,49 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             result.success(isDisabled)
         } catch (e: Exception) {
             result.error("IS_AAID_COLLECTION_DISABLED_FAILED", e.message, null)
+        }
+    }
+
+    private fun handleDeeplink(deeplinkUrl: String, result: Result) {
+        // Handle empty URL gracefully (matches SDK behavior)
+        if (deeplinkUrl.isBlank()) {
+            result.success(null)
+            return
+        }
+
+        if (nativeLinkRunner == null) {
+            result.error("NOT_INITIALIZED", "SDK not initialized", null)
+            return
+        }
+
+        pluginScope.launch {
+            try {
+                val handleDeeplinkResult = NativeLinkRunner.getInstance().handleDeeplink(deeplinkUrl)
+                
+                withContext(Dispatchers.Main) {
+                    if (handleDeeplinkResult.isSuccess) {
+                        val response = handleDeeplinkResult.getOrNull()
+                        if (response != null) {
+                            val resultMap = mutableMapOf<String, Any?>()
+                            val dataMap = mutableMapOf<String, Any?>()
+                            dataMap["is_linkrunner"] = response.isLinkrunner
+                            dataMap["deeplink"] = response.deeplink
+                            dataMap["processing"] = response.processing
+                            resultMap["data"] = dataMap
+                            result.success(resultMap)
+                        } else {
+                            result.success(mapOf<String, Any?>())
+                        }
+                    } else {
+                        val error = handleDeeplinkResult.exceptionOrNull()
+                        result.error("HANDLE_DEEPLINK_FAILED", error?.message ?: "Handle deeplink failed", null)
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    result.error("HANDLE_DEEPLINK_EXCEPTION", e.message, null)
+                }
+            }
         }
     }
 
