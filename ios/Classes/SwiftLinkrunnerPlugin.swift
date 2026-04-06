@@ -394,7 +394,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             do {
                 let response = try await LinkrunnerSDK.shared.handleDeeplink(url: deeplinkUrl)
                 DispatchQueue.main.async {
-                    result(response.toDictionary())
+                    result(["data": response.toDictionary()])
                 }
             } catch {
                 DispatchQueue.main.async {
