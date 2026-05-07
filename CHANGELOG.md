@@ -1,3 +1,7 @@
+## 3.9.1
+
+- Bumped native Android SDK to `io.linkrunner:android-sdk:3.8.1` (encrypted-at-rest credential storage)
+
 ## 3.9.0
 
 - Added `handleDeeplink()` method for re-engagement attribution tracking
