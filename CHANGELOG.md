@@ -1,3 +1,7 @@
+## 3.9.1
+
+- Bumped native Android SDK to `io.linkrunner:android-sdk:3.8.1` — token, signature key id, and signature secret key are now encrypted at rest in SharedPreferences using AES-256-GCM with a hardware-backed AndroidKeyStore key (StrongBox when available); legacy plaintext keys from prior versions are wiped atomically on the first `init()` after upgrade
+
 ## 3.9.0
 
 - Added `handleDeeplink()` method for re-engagement attribution tracking
