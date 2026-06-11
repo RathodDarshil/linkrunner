@@ -236,7 +236,12 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                             campaignMap["group_name"] = attributionData.campaignData.groupName
                             campaignMap["asset_name"] = attributionData.campaignData.assetName
                             campaignMap["asset_group_name"] = attributionData.campaignData.assetGroupName
-                            
+                            campaignMap["ad_network_campaign_id"] = attributionData.campaignData.adNetworkCampaignId
+                            campaignMap["ad_set_id"] = attributionData.campaignData.adSetId
+                            campaignMap["ad_set_name"] = attributionData.campaignData.adSetName
+                            campaignMap["ad_creative_id"] = attributionData.campaignData.adCreativeId
+                            campaignMap["ad_creative_name"] = attributionData.campaignData.adCreativeName
+
                             resultMap["campaign_data"] = campaignMap
                             
                             result.success(resultMap)
