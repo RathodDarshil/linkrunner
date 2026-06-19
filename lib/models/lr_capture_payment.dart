@@ -17,7 +17,7 @@ enum PaymentStatus {
 }
 
 class LRCapturePayment {
-  final String? paymentId;
+  final String paymentId;
   final String userId;
   final double amount;
   final PaymentType? type;
@@ -25,25 +25,26 @@ class LRCapturePayment {
   final Map<String, dynamic>? eventData;
 
   LRCapturePayment({
-    this.paymentId,
+    required this.paymentId,
     required this.userId,
     required this.amount,
     this.type,
     this.status,
     this.eventData,
-  });
+  }) {
+    if (paymentId.isEmpty) {
+      throw ArgumentError('paymentId must not be empty');
+    }
+  }
 
   Map<String, dynamic> toJSON() {
     Map<String, dynamic> json = {
+      'payment_id': paymentId,
       'user_id': userId,
       'amount': amount,
       'type': type?.name ?? PaymentType.DEFAULT_PAYMENT.name,
       'status': status?.name ?? PaymentStatus.PAYMENT_COMPLETED.name,
     };
-
-    if (paymentId != null) {
-      json['payment_id'] = paymentId;
-    }
 
     if (eventData != null) {
       json['event_data'] = eventData;
