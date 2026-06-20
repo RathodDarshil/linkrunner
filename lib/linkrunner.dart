@@ -257,6 +257,14 @@ class LinkRunner {
   }
 
   Future<void> setCustomerUserId(String userId) async {
+    if (userId.trim().isEmpty) {
+      developer.log(
+        'Linkrunner: Customer user id cannot be empty',
+        name: packageName,
+      );
+      throw Exception('Customer user id cannot be empty');
+    }
+
     try {
       await LinkRunnerNativeBridge.setCustomerUserId(userId: userId);
       developer.log(
