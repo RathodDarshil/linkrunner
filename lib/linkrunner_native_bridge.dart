@@ -274,7 +274,20 @@ class LinkRunnerNativeBridge {
       });
       developer.log('Push token set successfully', name: packageName);
     } on PlatformException catch (e) {
-      developer.log('Failed to set push token: ${e.message}', 
+      developer.log('Failed to set push token: ${e.message}',
+          error: e, name: packageName);
+      rethrow;
+    }
+  }
+
+  static Future<void> setCustomerUserId({required String userId}) async {
+    try {
+      await _channel.invokeMethod('setCustomerUserId', {
+        'userId': userId,
+      });
+      developer.log('Customer user id set successfully', name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to set customer user id: ${e.message}',
           error: e, name: packageName);
       rethrow;
     }

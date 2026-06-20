@@ -12,7 +12,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '3.9.1';
+  final String packageVersion = '3.10.0';
 
   String? token;
 
@@ -249,6 +249,31 @@ class LinkRunner {
     } catch (e) {
       developer.log(
         'Linkrunner: Failed to set push token',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> setCustomerUserId(String userId) async {
+    if (userId.trim().isEmpty) {
+      developer.log(
+        'Linkrunner: Customer user id cannot be empty',
+        name: packageName,
+      );
+      throw Exception('Customer user id cannot be empty');
+    }
+
+    try {
+      await LinkRunnerNativeBridge.setCustomerUserId(userId: userId);
+      developer.log(
+        'Linkrunner: Customer user id set successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to set customer user id',
         name: packageName,
         error: e,
       );
