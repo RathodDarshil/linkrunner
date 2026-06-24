@@ -256,6 +256,31 @@ class LinkRunner {
     }
   }
 
+  Future<void> setCustomerUserId(String userId) async {
+    if (userId.trim().isEmpty) {
+      developer.log(
+        'Linkrunner: Customer user id cannot be empty',
+        name: packageName,
+      );
+      throw Exception('Customer user id cannot be empty');
+    }
+
+    try {
+      await LinkRunnerNativeBridge.setCustomerUserId(userId: userId);
+      developer.log(
+        'Linkrunner: Customer user id set successfully',
+        name: packageName,
+      );
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to set customer user id',
+        name: packageName,
+        error: e,
+      );
+      rethrow;
+    }
+  }
+
   /// Disable AAID (Google Advertising ID) collection on Android
   /// When disabled, the SDK will not collect or send the Google Advertising ID (GAID).
   /// This is useful for apps targeting children or families to comply with Google Play's Family Policy.

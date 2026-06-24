@@ -106,7 +106,15 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "pushToken parameter is required", details: nil))
             }
-            
+
+        case "setCustomerUserId":
+            if let args = call.arguments as? [String: Any],
+               let userId = args["userId"] as? String {
+                setCustomerUserId(userId: userId, result: result)
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "userId parameter is required", details: nil))
+            }
+
         case "handleDeeplink":
             if let args = call.arguments as? [String: Any],
                let deeplinkUrl = args["deeplinkUrl"] as? String {
@@ -370,8 +378,30 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "SET_PUSH_TOKEN_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "SET_PUSH_TOKEN_FAILED",
+                                      message: error.localizedDescription,
+                                      details: nil))
+                }
+            }
+        }
+    }
+
+    private func setCustomerUserId(userId: String, result: @escaping FlutterResult) {
+        guard isInitialized else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
+            return
+        }
+
+        Task {
+            do {
+                try await LinkrunnerSDK.shared.setCustomerUserId(userId)
+                DispatchQueue.main.async {
+                    result(nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    result(FlutterError(code: "SET_CUSTOMER_USER_ID_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
