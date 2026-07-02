@@ -1,8 +1,8 @@
-## 3.10.0
+## 4.0.0
 
 - **Breaking:** `paymentId` is now required in `capturePayment`; the call throws before dispatch when it is missing
-- Bumped native Android SDK to `io.linkrunner:android-sdk:3.10.0`
-- Bumped native iOS SDK to `LinkrunnerKit 3.12.0`
+- Bumped native Android SDK to `io.linkrunner:android-sdk:4.0.0`
+- Bumped native iOS SDK to `LinkrunnerKit 4.0.0`
 
 ## 3.9.1
 
