@@ -32,7 +32,7 @@ class LRCapturePayment {
     this.status,
     this.eventData,
   }) {
-    if (paymentId.isEmpty) {
+    if (paymentId.trim().isEmpty) {
       throw ArgumentError('paymentId must not be empty');
     }
   }
