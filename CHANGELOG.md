@@ -1,3 +1,9 @@
+## 4.0.0
+
+- **Breaking:** `paymentId` is now required in `capturePayment`; the call throws before dispatch when it is missing
+- Bumped native Android SDK to `io.linkrunner:android-sdk:4.0.0`
+- Bumped native iOS SDK to `LinkrunnerKit 4.0.0`
+
 ## 3.10.0
 
 - Added `setCustomerUserId(userId)` method to attach your own user identifier to the device after `init()` — once set, the id is stored on-device and automatically included in every `trackEvent` call, so you no longer need to pass it on each event. Throws if the id is empty.
