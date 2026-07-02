@@ -4,6 +4,11 @@
 - Bumped native Android SDK to `io.linkrunner:android-sdk:4.0.0`
 - Bumped native iOS SDK to `LinkrunnerKit 4.0.0`
 
+## 3.10.0
+
+- Added `setCustomerUserId(userId)` method to attach your own user identifier to the device after `init()` — once set, the id is stored on-device and automatically included in every `trackEvent` call, so you no longer need to pass it on each event. Throws if the id is empty.
+- Bumped native Android SDK to `io.linkrunner:android-sdk:3.9.1` and native iOS SDK to `LinkrunnerKit 3.11.0` for native `user_id` auto-attach support
+
 ## 3.9.1
 
 - Bumped native Android SDK to `io.linkrunner:android-sdk:3.8.1` — token, signature key id, and signature secret key are now encrypted at rest in SharedPreferences using AES-256-GCM with a hardware-backed AndroidKeyStore key (StrongBox when available); legacy plaintext keys from prior versions are wiped atomically on the first `init()` after upgrade

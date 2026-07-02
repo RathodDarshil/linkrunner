@@ -127,6 +127,14 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     result.error("INVALID_ARGUMENT", "pushToken parameter is required", null)
                 }
             }
+            "setCustomerUserId" -> {
+                val userId = call.argument<String>("userId")
+                if (userId != null) {
+                    setCustomerUserId(userId, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "userId parameter is required", null)
+                }
+            }
             "setDisableAaidCollection" -> {
                 val disabled = call.argument<Boolean>("disabled")
                 if (disabled != null) {
@@ -467,6 +475,32 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     result.error("SET_PUSH_TOKEN_EXCEPTION", e.message, null)
+                }
+            }
+        }
+    }
+
+    private fun setCustomerUserId(userId: String, result: Result) {
+        if (userId.isBlank()) {
+            result.error("INVALID_ARGUMENT", "Customer user id cannot be empty", null)
+            return
+        }
+
+        pluginScope.launch {
+            try {
+                val setCustomerUserIdResult = NativeLinkRunner.getInstance().setCustomerUserId(userId)
+
+                withContext(Dispatchers.Main) {
+                    if (setCustomerUserIdResult.isSuccess) {
+                        result.success(null)
+                    } else {
+                        val error = setCustomerUserIdResult.exceptionOrNull()
+                        result.error("SET_CUSTOMER_USER_ID_FAILED", error?.message ?: "Set customer user id failed", null)
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    result.error("SET_CUSTOMER_USER_ID_EXCEPTION", e.message, null)
                 }
             }
         }
