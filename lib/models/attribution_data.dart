@@ -32,6 +32,11 @@ class CampaignData {
   final String? groupName;
   final String? assetGroupName;
   final String? assetName;
+  final String? adNetworkCampaignId;
+  final String? adSetId;
+  final String? adSetName;
+  final String? adCreativeId;
+  final String? adCreativeName;
   final String type;
   final String installedAt;
   final String storeClickAt;
@@ -43,6 +48,11 @@ class CampaignData {
     this.groupName,
     this.assetGroupName,
     this.assetName,
+    this.adNetworkCampaignId,
+    this.adSetId,
+    this.adSetName,
+    this.adCreativeId,
+    this.adCreativeName,
     required this.type,
     required this.installedAt,
     required this.storeClickAt,
@@ -59,6 +69,11 @@ class CampaignData {
       groupName: json['group_name'] as String?,
       assetGroupName: json['asset_group_name'] as String?,
       assetName: json['asset_name'] as String?,
+      adNetworkCampaignId: json['ad_network_campaign_id'] as String?,
+      adSetId: json['ad_set_id'] as String?,
+      adSetName: json['ad_set_name'] as String?,
+      adCreativeId: json['ad_creative_id'] as String?,
+      adCreativeName: json['ad_creative_name'] as String?,
       type: json['type'] as String? ?? '',
       installedAt: json['installed_at'] as String? ?? '',
       storeClickAt: json['store_click_at'] as String? ?? '',
@@ -73,6 +88,11 @@ class CampaignData {
       'group_name': groupName,
       'asset_group_name': assetGroupName,
       'asset_name': assetName,
+      'ad_network_campaign_id': adNetworkCampaignId,
+      'ad_set_id': adSetId,
+      'ad_set_name': adSetName,
+      'ad_creative_id': adCreativeId,
+      'ad_creative_name': adCreativeName,
       'type': type,
       'installed_at': installedAt,
       'store_click_at': storeClickAt,
