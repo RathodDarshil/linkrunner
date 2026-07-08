@@ -1,3 +1,8 @@
+## 4.0.1
+
+- Exposed ad-network attribution fields in attribution data: `adNetworkCampaignId`, `adSetId`, `adSetName`, `adCreativeId`, `adCreativeName`.
+- Bumped native Android SDK to `io.linkrunner:android-sdk:4.0.1` and native iOS SDK to `LinkrunnerKit 4.0.1`.
+
 ## 4.0.0
 
 - **Breaking:** `paymentId` is now required in `capturePayment`; the call throws before dispatch when it is missing
