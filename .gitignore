@@ -31,3 +31,7 @@ build/
 .flutter-plugins
 .flutter-plugins-dependencies
 repomix-output.txt
+
+# Gradle build cache (machine-local, must not be committed)
+.gradle/
+android/.gradle/
