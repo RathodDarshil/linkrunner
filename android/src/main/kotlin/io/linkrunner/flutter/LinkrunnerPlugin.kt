@@ -72,9 +72,9 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 }
             }
             "setAdditionalData" -> {
-                val IntegrationData = call.argument<Map<String, Any>>("IntegrationData")
-                if (IntegrationData != null) {
-                    setAdditionalData(IntegrationData, result)
+                val integrationData = call.argument<Map<String, Any>>("integrationData")
+                if (integrationData != null) {
+                    setAdditionalData(integrationData, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Integration data is required", null)
                 }
@@ -315,14 +315,14 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun setAdditionalData(IntegrationData: Map<String, Any>, result: Result) {
+    private fun setAdditionalData(integrationData: Map<String, Any>, result: Result) {
         pluginScope.launch {
             try {
-                val IntegrationDataModel = IntegrationData(
-                    clevertapId = IntegrationData["clevertap_id"] as? String
+                val integrationDataModel = IntegrationData(
+                    clevertapId = integrationData["clevertap_id"] as? String
                 )
                 
-                val setAdditionalDataResult = NativeLinkRunner.getInstance().setAdditionalData(IntegrationDataModel)
+                val setAdditionalDataResult = NativeLinkRunner.getInstance().setAdditionalData(integrationDataModel)
                 
                 withContext(Dispatchers.Main) {
                     if (setAdditionalDataResult.isSuccess) {
