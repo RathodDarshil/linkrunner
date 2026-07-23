@@ -1,3 +1,7 @@
+## 4.0.2
+
+- Fixed `setAdditionalData` on Android by aligning the native bridge argument key with Flutter and iOS.
+
 ## 4.0.1
 
 - Exposed ad-network attribution fields in attribution data: `adNetworkCampaignId`, `adSetId`, `adSetName`, `adCreativeId`, `adCreativeName`.
