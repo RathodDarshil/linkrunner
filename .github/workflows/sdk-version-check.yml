@@ -21,9 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - uses: dart-lang/setup-dart@v1
 
+      # No `pub get`: the checker uses dart:core/dart:io/dart:convert only.
       - name: Verify the SDK version is recorded in config-sdk-version.json
-        run: python3 scripts/check-sdk-version.py
+        run: dart run tool/check_sdk_version.dart
