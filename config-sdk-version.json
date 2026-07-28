@@ -1,0 +1,234 @@
+{
+  "sdk": "FLUTTER",
+  "package": "linkrunner-flutter",
+  "latest_version": "4.0.2",
+  "total_versions": 44,
+  "source": "version and description from Postgres public.\"SDKVersion\"; pushed_date from the package registry publish date, falling back to CHANGELOG.md, git tags, then manifest history",
+  "version_source": {
+    "file": "pubspec.yaml",
+    "type": "pubspec_yaml"
+  },
+  "version_mirrors": [],
+  "sdk_versions": [
+    {
+      "version": "4.0.2",
+      "pushed_date": "2026-07-23",
+      "description": "Fixed setAdditionalData on Android by aligning the native bridge argument key."
+    },
+    {
+      "version": "4.0.1",
+      "pushed_date": "2026-07-09",
+      "description": "Expanded attribution responses with ad-network campaign, ad set, and creative IDs and names for campaign-level reporting."
+    },
+    {
+      "version": "4.0.0",
+      "pushed_date": "2026-07-02",
+      "description": "Breaking change: payment capture now requires a non-empty paymentId so every payment can be uniquely identified."
+    },
+    {
+      "version": "3.10.0",
+      "pushed_date": "2026-06-20",
+      "description": "Added setCustomerUserId, which persists the application user ID and automatically includes it with subsequent tracked events."
+    },
+    {
+      "version": "3.9.1",
+      "pushed_date": "2026-05-07",
+      "description": "Updated the Android SDK to encrypt SDK credentials at rest with AndroidKeyStore."
+    },
+    {
+      "version": "3.9.0",
+      "pushed_date": "2026-04-06",
+      "description": "Added the handleDeeplink API for processing incoming deep links and resolving re-engagement attribution."
+    },
+    {
+      "version": "3.8.0",
+      "pushed_date": "2026-04-02",
+      "description": "Added the Netcore device GUID to user data so Linkrunner users can be matched with Netcore profiles."
+    },
+    {
+      "version": "3.7.0",
+      "pushed_date": "2026-03-05",
+      "description": "Added optional event data to payment capture for Meta Commerce Event Manager."
+    },
+    {
+      "version": "3.6.3",
+      "pushed_date": "2026-02-02",
+      "description": "Added Google Analytics session ID collection so Linkrunner events can be correlated with analytics sessions."
+    },
+    {
+      "version": "3.6.2",
+      "pushed_date": "2026-01-05",
+      "description": "Added Meta view-through attribution so eligible conversions can be attributed to ad impressions without a click."
+    },
+    {
+      "version": "3.6.1",
+      "pushed_date": "2025-12-18",
+      "description": "Updated the Android SDK to fix TypeToken obfuscation errors."
+    },
+    {
+      "version": "3.6.0",
+      "pushed_date": "2025-12-17",
+      "description": "Updated LinkrunnerKit to support Apple Search Ads attribution."
+    },
+    {
+      "version": "3.5.1",
+      "pushed_date": "2025-12-01",
+      "description": "Removed unused dependencies, models, and native modules to reduce package size and simplify maintenance."
+    },
+    {
+      "version": "3.5.0",
+      "pushed_date": "2025-11-27",
+      "description": "Added the option to disable Android advertising ID collection."
+    },
+    {
+      "version": "3.4.0",
+      "pushed_date": "2025-11-20",
+      "description": "Added an iOS initialization option to disable IDFA collection when advertising identifiers are not required."
+    },
+    {
+      "version": "3.3.0",
+      "pushed_date": "2025-11-10",
+      "description": "Added Braze device ID, Google Analytics app instance ID, and custom-event ID support."
+    },
+    {
+      "version": "3.2.2",
+      "pushed_date": "2025-10-27",
+      "description": "Added iOS push-token forwarding for uninstall tracking."
+    },
+    {
+      "version": "3.2.1",
+      "pushed_date": "2025-10-21",
+      "description": "Improved platform and version initialization, updated native dependencies, and removed getVersion."
+    },
+    {
+      "version": "3.2.0",
+      "pushed_date": "2025-10-21",
+      "description": "Added an API to register or update device push tokens for uninstall tracking and messaging integrations."
+    },
+    {
+      "version": "3.1.2",
+      "pushed_date": "2025-09-30",
+      "description": "Added Android backup rules to keep Linkrunner SharedPreferences out of device backups and restores."
+    },
+    {
+      "version": "3.1.1",
+      "pushed_date": "2025-09-12",
+      "description": "Added the SECOND_PAYMENT type so follow-up payments can be classified separately from initial and recurring payments."
+    },
+    {
+      "version": "3.1.0",
+      "pushed_date": "2025-08-13",
+      "description": "Updated the native SDKs with automatic API retries and stability improvements for transient request failures."
+    },
+    {
+      "version": "3.0.1",
+      "pushed_date": "2025-07-18",
+      "description": "Added the initialization debug option and expanded user-data fields."
+    },
+    {
+      "version": "3.0.0",
+      "pushed_date": "2025-06-27",
+      "description": "Implemented the native Android bridge and Flutter plugin integration."
+    },
+    {
+      "version": "2.0.0",
+      "pushed_date": "2025-06-12",
+      "description": "Added an API for retrieving the campaign and source data attributed to the current installation."
+    },
+    {
+      "version": "1.1.0",
+      "pushed_date": "2025-04-28",
+      "description": "Cleaned up pubspec configuration and updated device_info_plus."
+    },
+    {
+      "version": "1.0.1",
+      "pushed_date": "2025-03-13",
+      "description": "Synchronized the published package version with the version reported by the SDK at runtime."
+    },
+    {
+      "version": "1.0.0",
+      "pushed_date": "2025-03-13",
+      "description": "Introduced trackEvent, signup, setUserData, and triggerDeeplink, expanded attribution metrics, and deprecated the legacy trigger API."
+    },
+    {
+      "version": "0.7.9",
+      "pushed_date": "2024-12-07",
+      "description": "Included resolved campaign data in initialization results so applications can use attribution immediately after startup."
+    },
+    {
+      "version": "0.7.8",
+      "pushed_date": "2024-11-09",
+      "description": "Internal package maintenance release; no public API or runtime behavior changes were documented."
+    },
+    {
+      "version": "0.7.7",
+      "pushed_date": "2024-11-09",
+      "description": "Lowered the minimum supported Dart and Flutter versions."
+    },
+    {
+      "version": "0.7.6",
+      "pushed_date": "2024-09-13",
+      "description": "Updated installation and integration guidance to match the current Flutter plugin configuration."
+    },
+    {
+      "version": "0.7.5",
+      "pushed_date": "2024-09-13",
+      "description": "Removed the deprecated Google Ads deferred-deeplink implementation."
+    },
+    {
+      "version": "0.7.4",
+      "pushed_date": "2024-09-12",
+      "description": "Adjusted the shared_preferences version for wider compatibility."
+    },
+    {
+      "version": "0.7.3",
+      "pushed_date": "2024-09-08",
+      "description": "Added install instance ID support for consistently identifying an application installation."
+    },
+    {
+      "version": "0.7.2",
+      "pushed_date": "2024-09-02",
+      "description": "Removed unused Firebase dependencies to reduce the plugin dependency footprint and avoid host-app version conflicts."
+    },
+    {
+      "version": "0.7.1",
+      "pushed_date": "2024-09-02",
+      "description": "Documented Android install-referrer setup so campaign attribution can be configured correctly during integration."
+    },
+    {
+      "version": "0.7.0",
+      "pushed_date": "2024-08-21",
+      "description": "Added beta Google Ads tracking support for including advertising campaign data in attribution."
+    },
+    {
+      "version": "0.6.0",
+      "pushed_date": "2024-07-26",
+      "description": "Added payment capture APIs for sending revenue and transaction details to Linkrunner."
+    },
+    {
+      "version": "0.5.5",
+      "pushed_date": "2024-07-04",
+      "description": "Documented how to enable or disable automatic deep-link triggering during SDK integration."
+    },
+    {
+      "version": "0.5.4",
+      "pushed_date": "2024-06-13",
+      "description": "Removed the carrier_info dependency to simplify installation and avoid unnecessary native compatibility constraints."
+    },
+    {
+      "version": "0.5.3",
+      "pushed_date": "2024-06-04",
+      "description": "Corrected plugin registration, packaging, and integration issues found in the initial Flutter releases."
+    },
+    {
+      "version": "0.5.2",
+      "pushed_date": "2024-06-03",
+      "description": "Added singleton SDK access, React Native API parity, and device-data collection."
+    },
+    {
+      "version": "0.0.1",
+      "pushed_date": "2024-05-04",
+      "description": "Initial Flutter plugin release establishing the Dart API and native Android and iOS bridge structure."
+    }
+  ]
+}
