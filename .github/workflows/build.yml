@@ -1,0 +1,32 @@
+name: Build
+
+# Verifies the plugin resolves and analyzes cleanly. There is no example/ app in
+# this repo, so there is nothing to `flutter build`; analyze is the equivalent
+# compile-time check for a plugin package.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      # --no-fatal-infos: the public payment enums (ONE_TIME, PAYMENT_FAILED, …)
+      # trip constant_identifier_names by design; renaming them would break the
+      # published API. Warnings and errors still fail the build.
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
