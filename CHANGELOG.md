@@ -1,3 +1,7 @@
+## 4.0.3
+
+- Bumped the native Android SDK to `io.linkrunner:android-sdk:4.0.2` to prevent signup from sending an empty install instance ID when it runs concurrently with initialization.
+
 ## 4.0.2
 
 - Fixed `setAdditionalData` on Android by aligning the native bridge argument key with Flutter and iOS.
