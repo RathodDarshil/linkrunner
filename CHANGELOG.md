@@ -1,3 +1,12 @@
+## 4.1.0
+
+- Added support for Google Integrated Conversion Measurement (ICM). On iOS the native SDK now fetches Google's On-Device Measurement value automatically during initialization and forwards it to Linkrunner; no Dart API change is required to adopt it.
+- Bumped native Android SDK to `io.linkrunner:android-sdk:4.1.0` and native iOS SDK to `LinkrunnerKit 4.1.0`.
+- iOS apps now pull `GoogleAdsOnDeviceConversion` transitively and require `-ObjC` and `-lc++` in Other Linker Flags. CocoaPods applies these automatically. If your app also uses Firebase Analytics, check the version compatibility table in the LinkrunnerKit README.
+- Fixed the iOS podspec version, which had drifted to `3.4.0` while `pubspec.yaml` was on `4.0.1`. Both now track the package version.
+
+Note: setting Google Ads consent (`isEEA`, `adUserData`, `adPersonalization`) is not yet exposed through the Dart bridge. Until it is, consent is reported as unknown, which Google treats as "not known" rather than as granted.
+
 ## 4.0.1
 
 - Exposed ad-network attribution fields in attribution data: `adNetworkCampaignId`, `adSetId`, `adSetName`, `adCreativeId`, `adCreativeName`.
