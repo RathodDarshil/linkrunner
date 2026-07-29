@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'models/attribution_data.dart';
 import 'models/lr_capture_payment.dart';
+import 'models/lr_consent.dart';
 import 'models/lr_remove_payment.dart';
 import 'models/lr_user_data.dart';
 import 'models/deeplink_data.dart';
@@ -305,6 +306,19 @@ class LinkRunnerNativeBridge {
           name: packageName);
     } on PlatformException catch (e) {
       developer.log('Failed to ${disabled ? 'disable' : 'enable'} AAID collection: ${e.message}', 
+          error: e, name: packageName);
+      rethrow;
+    }
+  }
+
+  /// Set the Google Ads consent state, normally from your Consent Management Platform.
+  /// Supported on iOS and Android.
+  static Future<void> setConsent(LRConsent consent) async {
+    try {
+      await _channel.invokeMethod('setConsent', consent.toJSON());
+      developer.log('Consent set successfully', name: packageName);
+    } on PlatformException catch (e) {
+      developer.log('Failed to set consent: ${e.message}',
           error: e, name: packageName);
       rethrow;
     }

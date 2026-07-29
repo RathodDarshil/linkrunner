@@ -99,6 +99,10 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "enabled parameter is required", details: nil))
             }
             
+        case "setConsent":
+            let args = call.arguments as? [String: Any]
+            setConsent(args: args ?? [:], result: result)
+
         case "setPushToken":
             if let args = call.arguments as? [String: Any],
                let pushToken = args["pushToken"] as? String {
@@ -361,6 +365,23 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     
     private func enablePIIHashing(enabled: Bool, result: @escaping FlutterResult) {
         LinkrunnerSDK.shared.enablePIIHashing(enabled)
+        result(nil)
+    }
+
+    /// Maps a Dart consent value ("GRANTED"/"DENIED"/"UNKNOWN") to `ConsentStatus`.
+    /// Anything absent or unrecognised becomes `.unknown` rather than a guess.
+    private func consentStatus(from args: [String: Any], key: String) -> ConsentStatus {
+        guard let raw = args[key] as? String else { return .unknown }
+        return ConsentStatus(rawValue: raw.lowercased()) ?? .unknown
+    }
+
+    private func setConsent(args: [String: Any], result: @escaping FlutterResult) {
+        let consent = LinkrunnerConsent(
+            isEEA: consentStatus(from: args, key: "isEEA"),
+            hasConsentForDataUsage: consentStatus(from: args, key: "adUserData"),
+            hasConsentForAdsPersonalization: consentStatus(from: args, key: "adPersonalization")
+        )
+        LinkrunnerSDK.shared.setConsent(consent)
         result(nil)
     }
     
