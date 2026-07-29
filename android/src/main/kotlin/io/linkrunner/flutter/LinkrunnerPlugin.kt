@@ -537,8 +537,8 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             NativeLinkRunner.getInstance().setConsent(
                 LinkrunnerConsent(
                     isEEA = status("isEEA"),
-                    adUserData = status("adUserData"),
-                    adPersonalization = status("adPersonalization")
+                    hasConsentForDataUsage = status("hasConsentForDataUsage"),
+                    hasConsentForAdsPersonalization = status("hasConsentForAdsPersonalization")
                 )
             )
             result.success(null)

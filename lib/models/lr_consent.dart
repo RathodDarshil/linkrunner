@@ -14,22 +14,24 @@ class LRConsent {
   final ConsentStatus isEEA;
 
   /// Consent to send user data to Google for advertising purposes.
-  final ConsentStatus adUserData;
+  /// Sent as `ad_user_data`.
+  final ConsentStatus hasConsentForDataUsage;
 
   /// Consent to use the data for ad personalization.
-  final ConsentStatus adPersonalization;
+  /// Sent as `ad_personalization`.
+  final ConsentStatus hasConsentForAdsPersonalization;
 
   const LRConsent({
     this.isEEA = ConsentStatus.UNKNOWN,
-    this.adUserData = ConsentStatus.UNKNOWN,
-    this.adPersonalization = ConsentStatus.UNKNOWN,
+    this.hasConsentForDataUsage = ConsentStatus.UNKNOWN,
+    this.hasConsentForAdsPersonalization = ConsentStatus.UNKNOWN,
   });
 
   Map<String, dynamic> toJSON() {
     return {
       'isEEA': isEEA.name,
-      'adUserData': adUserData.name,
-      'adPersonalization': adPersonalization.name,
+      'hasConsentForDataUsage': hasConsentForDataUsage.name,
+      'hasConsentForAdsPersonalization': hasConsentForAdsPersonalization.name,
     };
   }
 }

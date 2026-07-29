@@ -4,7 +4,7 @@
 - Bumped native Android SDK to `io.linkrunner:android-sdk:4.1.0` and native iOS SDK to `LinkrunnerKit 4.1.0`.
 - iOS apps now pull `GoogleAdsOnDeviceConversion` transitively and require `-ObjC` and `-lc++` in Other Linker Flags. CocoaPods applies these automatically. If your app also uses Firebase Analytics, check the version compatibility table in the LinkrunnerKit README.
 - Fixed the iOS podspec version, which had drifted to `3.4.0` while `pubspec.yaml` was on `4.0.1`. Both now track the package version.
-- `setConsent(LRConsent(...))` for Google Ads consent: `isEEA`, `adUserData` and `adPersonalization`, each `ConsentStatus.GRANTED` / `.DENIED` / `.UNKNOWN`. Call it before `init` and again whenever your CMP state changes. Omitted signals default to `.UNKNOWN` and are dropped from the payload rather than sent as a denial. Supported on iOS and Android.
+- `setConsent(LRConsent(...))` for Google Ads consent: `isEEA`, `hasConsentForDataUsage` and `hasConsentForAdsPersonalization`, each `ConsentStatus.GRANTED` / `.DENIED` / `.UNKNOWN` (field names match the native iOS and Android SDKs; they are sent as `is_eea`, `ad_user_data` and `ad_personalization`). Call it before `init` and again whenever your CMP state changes. Omitted signals default to `.UNKNOWN` and are dropped from the payload rather than sent as a denial. Supported on iOS and Android.
 
 ## 4.0.3
 

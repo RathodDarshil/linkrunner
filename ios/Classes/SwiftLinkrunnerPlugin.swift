@@ -378,8 +378,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
     private func setConsent(args: [String: Any], result: @escaping FlutterResult) {
         let consent = LinkrunnerConsent(
             isEEA: consentStatus(from: args, key: "isEEA"),
-            hasConsentForDataUsage: consentStatus(from: args, key: "adUserData"),
-            hasConsentForAdsPersonalization: consentStatus(from: args, key: "adPersonalization")
+            hasConsentForDataUsage: consentStatus(from: args, key: "hasConsentForDataUsage"),
+            hasConsentForAdsPersonalization: consentStatus(from: args, key: "hasConsentForAdsPersonalization")
         )
         LinkrunnerSDK.shared.setConsent(consent)
         result(nil)
