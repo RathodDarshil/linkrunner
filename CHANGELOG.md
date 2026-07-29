@@ -1,8 +1,14 @@
 ## 4.1.0
 
-- Added support for Google Integrated Conversion Measurement (ICM). On iOS the native SDK now fetches Google's On-Device Measurement value automatically during initialization and forwards it to Linkrunner; no Dart API change is required to adopt it.
-- Bumped native Android SDK to `io.linkrunner:android-sdk:4.1.0` and native iOS SDK to `LinkrunnerKit 4.1.0`.
-- iOS apps now pull `GoogleAdsOnDeviceConversion` transitively and require `-ObjC` and `-lc++` in Other Linker Flags. CocoaPods applies these automatically. If your app also uses Firebase Analytics, check the version compatibility table in the LinkrunnerKit README.
+- Added support for Google Integrated Conversion Measurement (ICM) on iOS. The native SDK fetches Google's On-Device Measurement value during initialization and forwards it to Linkrunner. There is no Dart API to call, but ICM is **opt-in**: it stays inactive until you add Google's SDK to your app (see below). ICM is iOS-only for now; Android is unaffected.
+- **To enable ICM on iOS**, add Google's On-Device Measurement SDK to your app's `ios/Podfile`:
+
+  ```ruby
+  pod 'GoogleAdsOnDeviceConversion'
+  ```
+
+  If your app already uses the Firebase iOS SDK (11.14.0+) you have it and need nothing further. LinkrunnerKit detects the SDK at runtime rather than depending on it, so apps that skip this carry none of its weight — no extra dependency, no size increase. CocoaPods adds the required `-ObjC` and `-lc++` linker flags for you, so Flutter apps have no Build Settings changes to make. To confirm it is live, initialize with `debug: true` and look for `odm_available=true` in the iOS logs; `odm_available=false` means Google's SDK is not linked.
+- Bumped native iOS SDK to `LinkrunnerKit 4.1.0` (ICM plus the consent model) and native Android SDK to `io.linkrunner:android-sdk:4.1.0` (consent model only).
 - Fixed the iOS podspec version, which had drifted to `3.4.0` while `pubspec.yaml` was on `4.0.1`. Both now track the package version.
 - `setConsent(LRConsent(...))` for Google Ads consent: `isEEA`, `hasConsentForDataUsage` and `hasConsentForAdsPersonalization`, each `ConsentStatus.GRANTED` / `.DENIED` / `.UNKNOWN` (field names match the native iOS and Android SDKs; they are sent as `is_eea`, `ad_user_data` and `ad_personalization`). Call it before `init` and again whenever your CMP state changes. Omitted signals default to `.UNKNOWN` and are dropped from the payload rather than sent as a denial. Supported on iOS and Android.
 
