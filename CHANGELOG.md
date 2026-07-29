@@ -6,6 +6,14 @@
 - Fixed the iOS podspec version, which had drifted to `3.4.0` while `pubspec.yaml` was on `4.0.1`. Both now track the package version.
 - `setConsent(LRConsent(...))` for Google Ads consent: `isEEA`, `adUserData` and `adPersonalization`, each `ConsentStatus.GRANTED` / `.DENIED` / `.UNKNOWN`. Call it before `init` and again whenever your CMP state changes. Omitted signals default to `.UNKNOWN` and are dropped from the payload rather than sent as a denial. Supported on iOS and Android.
 
+## 4.0.3
+
+- Bumped the native Android SDK to `io.linkrunner:android-sdk:4.0.2` to prevent signup from sending an empty install instance ID when it runs concurrently with initialization.
+
+## 4.0.2
+
+- Fixed `setAdditionalData` on Android by aligning the native bridge argument key with Flutter and iOS.
+
 ## 4.0.1
 
 - Exposed ad-network attribution fields in attribution data: `adNetworkCampaignId`, `adSetId`, `adSetName`, `adCreativeId`, `adCreativeName`.
