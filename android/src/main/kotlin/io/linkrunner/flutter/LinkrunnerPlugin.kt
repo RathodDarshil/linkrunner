@@ -15,6 +15,8 @@ import kotlinx.coroutines.withContext
 
 // Import the native LinkRunner SDK classes
 import io.linkrunner.sdk.LinkRunner as NativeLinkRunner
+import io.linkrunner.sdk.models.ConsentStatus
+import io.linkrunner.sdk.models.LinkrunnerConsent
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.request.CapturePaymentRequest
 import io.linkrunner.sdk.models.request.RemovePaymentRequest
@@ -145,6 +147,9 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             }
             "isAaidCollectionDisabled" -> {
                 isAaidCollectionDisabled(result)
+            }
+            "setConsent" -> {
+                setConsent(call, result)
             }
             "handleDeeplink" -> {
                 val deeplinkUrl = call.argument<String>("deeplinkUrl")
@@ -518,6 +523,27 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             result.success(null)
         } catch (e: Exception) {
             result.error("SET_DISABLE_AAID_FAILED", e.message, null)
+        }
+    }
+
+    private fun setConsent(call: MethodCall, result: Result) {
+        try {
+            fun status(key: String): ConsentStatus = when (call.argument<String>(key)) {
+                "GRANTED" -> ConsentStatus.GRANTED
+                "DENIED" -> ConsentStatus.DENIED
+                else -> ConsentStatus.UNKNOWN
+            }
+
+            NativeLinkRunner.getInstance().setConsent(
+                LinkrunnerConsent(
+                    isEEA = status("isEEA"),
+                    hasConsentForDataUsage = status("hasConsentForDataUsage"),
+                    hasConsentForAdsPersonalization = status("hasConsentForAdsPersonalization")
+                )
+            )
+            result.success(null)
+        } catch (e: Exception) {
+            result.error("SET_CONSENT_FAILED", e.message, null)
         }
     }
 

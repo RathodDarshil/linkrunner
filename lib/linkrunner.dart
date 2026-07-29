@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_capture_payment.dart';
+import 'package:linkrunner/models/lr_consent.dart';
 import 'package:linkrunner/models/lr_remove_payment.dart';
 import 'package:linkrunner/models/deeplink_data.dart';
 
@@ -12,7 +13,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.0.3';
+  final String packageVersion = '4.1.0';
 
   String? token;
 
@@ -278,6 +279,27 @@ class LinkRunner {
         error: e,
       );
       rethrow;
+    }
+  }
+
+  /// Set the Google Ads consent state.
+  ///
+  /// Call it before [init] so the first payload carries the correct state, and call it
+  /// again whenever your CMP state changes. Anything omitted or left
+  /// [ConsentStatus.UNKNOWN] is reported as unknown rather than assumed granted, and is
+  /// dropped from the payload entirely.
+  ///
+  /// Required only if you run Google App Campaigns and have users in the EEA, the UK,
+  /// or Switzerland. Supported on iOS and Android.
+  Future<void> setConsent(LRConsent consent) async {
+    try {
+      await LinkRunnerNativeBridge.setConsent(consent);
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to set consent',
+        name: packageName,
+        error: e,
+      );
     }
   }
 
