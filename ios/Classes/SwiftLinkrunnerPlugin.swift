@@ -103,6 +103,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             let args = call.arguments as? [String: Any]
             setConsent(args: args ?? [:], result: result)
 
+        case "enableTCFConsentCollection":
+            if let args = call.arguments as? [String: Any],
+               let enabled = args["enabled"] as? Bool {
+                enableTCFConsentCollection(enabled: enabled, result: result)
+            } else {
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "enabled parameter is required", details: nil))
+            }
+
         case "setPushToken":
             if let args = call.arguments as? [String: Any],
                let pushToken = args["pushToken"] as? String {
@@ -384,7 +392,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         LinkrunnerSDK.shared.setConsent(consent)
         result(nil)
     }
-    
+
+    /// Not gated on `isInitialized`: the Dart layer calls this before `init` so the first
+    /// payload already carries the CMP's values, and the native SDK reads the keys lazily.
+    private func enableTCFConsentCollection(enabled: Bool, result: @escaping FlutterResult) {
+        LinkrunnerSDK.shared.enableTCFConsentCollection(enabled)
+        result(nil)
+    }
+
     private func setPushToken(pushToken: String, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
