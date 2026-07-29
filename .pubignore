@@ -1,0 +1,19 @@
+example/
+.dart_tool/
+.idea/
+.vscode/
+.packages
+.pub/
+build/
+*.iml
+.DS_Store
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# CocoaPods output from local development, not part of the package
+ios/Pods/
+ios/.symlinks/
+
+# Internal working docs
+CLAUDE.md
+CROSS_REFERENCE_ARCHITECTURE.md
