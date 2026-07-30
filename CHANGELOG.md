@@ -1,3 +1,13 @@
+## 4.3.0
+
+- `enableTCFConsentCollection(enabled)` now works on Android too, matching iOS. The native Android SDK (4.2.0) reads the CMP's standard `IABTCF_*` keys from the default SharedPreferences and applies the same Google TCF purpose mapping; anything set explicitly with `setConsent` still wins, per signal. Bumped the native Android SDK to `io.linkrunner:android-sdk:4.2.0`.
+
+## 4.2.0
+
+- Added `enableTCFConsentCollection(enabled)`, which derives the Google Ads consent state from an IAB TCF v2.2/v2.3 Consent Management Platform instead of requiring `setConsent`. The native SDK reads the CMP's standard `IABTCF_*` keys and applies Google's published purpose mapping. Anything you set explicitly with `setConsent` still wins, per signal.
+- It is opt-in rather than automatic because interpreting a TC string on your behalf is a legal judgement. Only enable it if you use a TCF-compliant CMP: custom consent screens and Firebase Consent Mode do not write those keys.
+- Not persisted, so call it on every launch before `init`. iOS only, matching the React Native SDK: the native Android SDK has no TCF support, so on Android the call logs and returns rather than failing on a missing method channel handler.
+
 ## 4.1.0
 
 - Added support for Google Integrated Conversion Measurement (ICM) on iOS. The native SDK fetches Google's On-Device Measurement value during initialization and forwards it to Linkrunner. There is no Dart API to call, but ICM is **opt-in**: it stays inactive until you add Google's SDK to your app (see below). ICM is iOS-only for now; Android is unaffected.

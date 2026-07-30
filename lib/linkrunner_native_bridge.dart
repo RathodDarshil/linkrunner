@@ -324,6 +324,25 @@ class LinkRunnerNativeBridge {
     }
   }
 
+  /// Collect the Google Ads consent state from an IAB TCF Consent Management Platform.
+  /// Supported on iOS and Android.
+  static Future<void> enableTCFConsentCollection(bool enabled) async {
+    try {
+      await _channel.invokeMethod('enableTCFConsentCollection', {
+        'enabled': enabled,
+      });
+      developer.log(
+          'TCF consent collection ${enabled ? 'enabled' : 'disabled'} successfully',
+          name: packageName);
+    } on PlatformException catch (e) {
+      developer.log(
+          'Failed to ${enabled ? 'enable' : 'disable'} TCF consent collection: ${e.message}',
+          error: e,
+          name: packageName);
+      rethrow;
+    }
+  }
+
   /// Check if AAID collection is currently disabled (Android only)
   /// Returns true if AAID collection is disabled, false otherwise
   static Future<bool> isAaidCollectionDisabled() async {

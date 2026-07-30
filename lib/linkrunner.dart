@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_consent.dart';
@@ -13,7 +15,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.1.0';
+  final String packageVersion = '4.3.0';
 
   String? token;
 
@@ -297,6 +299,41 @@ class LinkRunner {
     } catch (e) {
       developer.log(
         'Linkrunner: Failed to set consent',
+        name: packageName,
+        error: e,
+      );
+    }
+  }
+
+  /// Collect the Google Ads consent state from an IAB TCF v2.2/v2.3 Consent Management
+  /// Platform instead of setting it yourself.
+  ///
+  /// When enabled, the SDK reads the CMP's standard `IABTCF_*` keys. Anything set
+  /// explicitly through [setConsent] still wins, per signal.
+  ///
+  /// Opt in rather than automatic, because interpreting a TC string on your behalf is a
+  /// legal judgement. Only enable it if you use a TCF-compliant CMP: custom consent
+  /// screens and Firebase Consent Mode do not write those keys.
+  ///
+  /// Not persisted, so call it on every launch before [init]. Supported on iOS and
+  /// Android. On other platforms this is a no-op.
+  ///
+  /// - Parameter enabled: Whether TCF consent collection should be enabled (default: true)
+  Future<void> enableTCFConsentCollection([bool enabled = true]) async {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.android) {
+      developer.log(
+        'Linkrunner: TCF consent collection is only supported on iOS and Android, ignoring',
+        name: packageName,
+      );
+      return;
+    }
+
+    try {
+      await LinkRunnerNativeBridge.enableTCFConsentCollection(enabled);
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} TCF consent collection',
         name: packageName,
         error: e,
       );

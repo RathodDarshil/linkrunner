@@ -151,6 +151,14 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             "setConsent" -> {
                 setConsent(call, result)
             }
+            "enableTCFConsentCollection" -> {
+                val enabled = call.argument<Boolean>("enabled")
+                if (enabled != null) {
+                    enableTCFConsentCollection(enabled, result)
+                } else {
+                    result.error("INVALID_ARGUMENT", "enabled parameter is required", null)
+                }
+            }
             "handleDeeplink" -> {
                 val deeplinkUrl = call.argument<String>("deeplinkUrl")
                 if (deeplinkUrl != null) {
@@ -544,6 +552,16 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             result.success(null)
         } catch (e: Exception) {
             result.error("SET_CONSENT_FAILED", e.message, null)
+        }
+    }
+
+    private fun enableTCFConsentCollection(enabled: Boolean, result: Result) {
+        try {
+            NativeLinkRunner.getInstance().enableTCFConsentCollection(enabled)
+            android.util.Log.d("LinkRunner", "TCF consent collection ${if (enabled) "enabled" else "disabled"}")
+            result.success(null)
+        } catch (e: Exception) {
+            result.error("ENABLE_TCF_CONSENT_COLLECTION_FAILED", e.message, null)
         }
     }
 
