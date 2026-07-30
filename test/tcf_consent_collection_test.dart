@@ -51,11 +51,20 @@ void main() {
       expect(calls.single.arguments, {'enabled': false});
     });
 
-    // The native Android SDK has no TCF support, so the platform channel has no
-    // handler for this method. Reaching it would throw MissingPluginException in
-    // the caller's app, which is why the Dart layer returns before invoking it.
-    test('is a no-op on Android', () async {
+    // The native Android SDK supports TCF from 4.2.0, so Android goes through the
+    // same method channel handler as iOS.
+    test('forwards the flag to the native SDK on Android', () async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+      await LinkRunner().enableTCFConsentCollection(true);
+
+      expect(calls, hasLength(1));
+      expect(calls.single.method, 'enableTCFConsentCollection');
+      expect(calls.single.arguments, {'enabled': true});
+    });
+
+    test('is a no-op on other platforms', () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
 
       await LinkRunner().enableTCFConsentCollection(true);
 
