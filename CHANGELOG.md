@@ -1,3 +1,7 @@
+## 4.3.0
+
+- `enableTCFConsentCollection(enabled)` now works on Android too, matching iOS. The native Android SDK (4.2.0) reads the CMP's standard `IABTCF_*` keys from the default SharedPreferences and applies the same Google TCF purpose mapping; anything set explicitly with `setConsent` still wins, per signal. Bumped the native Android SDK to `io.linkrunner:android-sdk:4.2.0`.
+
 ## 4.2.0
 
 - Added `enableTCFConsentCollection(enabled)`, which derives the Google Ads consent state from an IAB TCF v2.2/v2.3 Consent Management Platform instead of requiring `setConsent`. The native SDK reads the CMP's standard `IABTCF_*` keys and applies Google's published purpose mapping. Anything you set explicitly with `setConsent` still wins, per signal.

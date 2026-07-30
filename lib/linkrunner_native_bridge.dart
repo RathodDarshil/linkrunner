@@ -325,7 +325,7 @@ class LinkRunnerNativeBridge {
   }
 
   /// Collect the Google Ads consent state from an IAB TCF Consent Management Platform.
-  /// iOS only: the native Android SDK has no TCF support.
+  /// Supported on iOS and Android.
   static Future<void> enableTCFConsentCollection(bool enabled) async {
     try {
       await _channel.invokeMethod('enableTCFConsentCollection', {

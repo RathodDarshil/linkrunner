@@ -15,7 +15,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.2.0';
+  final String packageVersion = '4.3.0';
 
   String? token;
 
@@ -315,14 +315,15 @@ class LinkRunner {
   /// legal judgement. Only enable it if you use a TCF-compliant CMP: custom consent
   /// screens and Firebase Consent Mode do not write those keys.
   ///
-  /// Not persisted, so call it on every launch before [init]. iOS only, because the
-  /// native Android SDK has no TCF support. On other platforms this is a no-op.
+  /// Not persisted, so call it on every launch before [init]. Supported on iOS and
+  /// Android. On other platforms this is a no-op.
   ///
   /// - Parameter enabled: Whether TCF consent collection should be enabled (default: true)
   Future<void> enableTCFConsentCollection([bool enabled = true]) async {
-    if (defaultTargetPlatform != TargetPlatform.iOS) {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.android) {
       developer.log(
-        'Linkrunner: TCF consent collection is iOS only, ignoring',
+        'Linkrunner: TCF consent collection is only supported on iOS and Android, ignoring',
         name: packageName,
       );
       return;
