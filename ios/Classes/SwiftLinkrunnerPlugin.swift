@@ -69,14 +69,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         case "capturePayment":
             if let args = call.arguments as? [String: Any],
                let userId = args["userId"] as? String,
-               let amount = args["amount"] as? Double {
-                let paymentId = args["paymentId"] as? String
+               let amount = args["amount"] as? Double,
+               let paymentId = args["paymentId"] as? String, !paymentId.isEmpty {
                 let type = args["type"] as? String ?? "DEFAULT_PAYMENT"
                 let status = args["status"] as? String ?? "PAYMENT_COMPLETED"
                 let eventData = args["eventData"] as? [String: Any]
                 capturePayment(userId: userId, amount: amount, paymentId: paymentId, type: type, status: status, eventData: eventData, result: result)
             } else {
-                result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID and amount are required", details: nil))
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID, amount and payment ID are required", details: nil))
             }
             
         case "removePayment":
@@ -305,7 +305,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
+    private func capturePayment(userId: String, amount: Double, paymentId: String, type: String, status: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return

@@ -13,7 +13,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.1.0';
+  final String packageVersion = '4.1.1';
 
   String? token;
 
