@@ -1,3 +1,7 @@
+## 4.1.1
+
+- Fixed a Swift compiler error that broke every iOS build on `4.0.1` through `4.1.0`: the iOS bridge passed an optional `paymentId` into `LinkrunnerKit.capturePayment`, which has required a non-optional `String` since LinkrunnerKit 4.0.0. Builds failed with `Value of optional type 'String?' must be unwrapped to a value of type 'String'` regardless of your Dart code. `paymentId` is now unwrapped at the method-channel boundary. No API change — `LRCapturePayment.paymentId` was already required and non-empty validated, so correct callers are unaffected. Android was never affected.
+
 ## 4.1.0
 
 - Added support for Google Integrated Conversion Measurement (ICM) on iOS. The native SDK fetches Google's On-Device Measurement value during initialization and forwards it to Linkrunner. There is no Dart API to call, but ICM is **opt-in**: it stays inactive until you add Google's SDK to your app (see below). ICM is iOS-only for now; Android is unaffected.

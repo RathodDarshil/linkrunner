@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name             = 'linkrunner'
   # Keep in step with pubspec.yaml — these drifted apart previously (pubspec 4.0.1
   # against podspec 3.4.0).
-  s.version          = '4.1.0'
+  s.version          = '4.1.1'
   s.summary          = 'Flutter Package for linkrunner, track every click, download and dropoff for your app links'
   s.description      = <<-DESC
 Flutter Package for linkrunner.io - Advanced app attribution and link tracking service. 
