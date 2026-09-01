@@ -1,3 +1,7 @@
+## 4.1.2
+
+- Fixed a fatal Android crash from `enablePIIHashing()`: `PlatformException(ENABLE_PII_HASHING_FAILED, Context not set)` reaching `PlatformDispatcher.onError`. The native Android SDK required an application context that is only set inside `init()`, so calling `enablePIIHashing()` before `init()` — or right after an un-awaited `init()` — threw, and the Dart wrapper rethrew into an app that had nothing awaiting the call. Fixed on both sides: the bundled Android SDK is now 4.1.1, where the call is safe before `init()` and the flag is persisted during initialization, and `LinkRunner.enablePIIHashing()` now logs failures instead of rethrowing, since it is a fire-and-forget configuration setter. A pre-`init()` call is also no longer silently discarded. iOS was never affected.
+
 ## 4.1.1
 
 - Fixed a Swift compiler error that broke every iOS build on `4.0.1` through `4.1.0`: the iOS bridge passed an optional `paymentId` into `LinkrunnerKit.capturePayment`, which has required a non-optional `String` since LinkrunnerKit 4.0.0. Builds failed with `Value of optional type 'String?' must be unwrapped to a value of type 'String'` regardless of your Dart code. `paymentId` is now unwrapped at the method-channel boundary. No API change — `LRCapturePayment.paymentId` was already required and non-empty validated, so correct callers are unaffected. Android was never affected.

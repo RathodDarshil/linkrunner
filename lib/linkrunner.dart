@@ -13,7 +13,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.1.1';
+  final String packageVersion = '4.1.2';
 
   String? token;
 
@@ -210,6 +210,10 @@ class LinkRunner {
   /// before being sent to the server
   ///
   /// - Parameter enabled: Whether PII hashing should be enabled (defaults to true)
+  ///
+  /// This is a fire-and-forget configuration setter and never throws. Most callers do
+  /// not await it, so a rethrown platform error would escape to
+  /// `PlatformDispatcher.onError` and crash the host app; failures are logged instead.
   Future<void> enablePIIHashing([bool enabled = true]) async {
     try {
       await LinkRunnerNativeBridge.enablePIIHashing(enabled: enabled);
@@ -223,7 +227,6 @@ class LinkRunner {
         name: packageName,
         error: e,
       );
-      rethrow;
     }
   }
 
