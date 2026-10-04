@@ -1,6 +1,7 @@
 ## 4.1.2
 
 - Fixed a fatal Android crash from `enablePIIHashing()`: `PlatformException(ENABLE_PII_HASHING_FAILED, Context not set)` reaching `PlatformDispatcher.onError`. The native Android SDK required an application context that is only set inside `init()`, so calling `enablePIIHashing()` before `init()` — or right after an un-awaited `init()` — threw, and the Dart wrapper rethrew into an app that had nothing awaiting the call. Fixed on both sides: the bundled Android SDK is now 4.1.1, where the call is safe before `init()` and the flag is persisted during initialization, and `LinkRunner.enablePIIHashing()` now logs failures instead of rethrowing, since it is a fire-and-forget configuration setter. A pre-`init()` call is also no longer silently discarded. iOS was never affected.
+- `enablePIIHashing(true)` now hashes `name`, `email` and `phone` on Android. Before, the native Android SDK stored the flag but never applied it, so `signup` and `setUserData` sent those fields in plain text while iOS sent SHA-256 hashes. Android now sends the same lowercase SHA-256 hex as iOS, so the same input gives the same hash on both platforms. Nothing changes when hashing is off. The fix ships in the bundled native Android SDK 4.1.1, so there is no Dart change.
 
 ## 4.1.1
 
