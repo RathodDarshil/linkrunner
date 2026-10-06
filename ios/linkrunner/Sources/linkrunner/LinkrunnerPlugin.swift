@@ -2,14 +2,14 @@ import Flutter
 import UIKit
 import LinkrunnerKit
 
-@objc
-public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
+@objc(LinkrunnerPlugin)
+public class LinkrunnerPlugin: NSObject, FlutterPlugin {
     private var isInitialized: Bool = false
-    
+
     @objc
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "linkrunner_native", binaryMessenger: registrar.messenger())
-        let instance = SwiftLinkrunnerPlugin()
+        let instance = LinkrunnerPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
@@ -27,10 +27,10 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Token is required", details: nil))
             }
-            
+
         case "getAttributionData":
             getAttributionData(result: result)
-            
+
         case "signup":
             if let args = call.arguments as? [String: Any],
                let userData = args["userData"] as? [String: Any] {
@@ -39,7 +39,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "User data is required", details: nil))
             }
-            
+
         case "setUserData":
             if let args = call.arguments as? [String: Any],
                let userData = args["userData"] as? [String: Any] {
@@ -47,7 +47,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "User data is required", details: nil))
             }
-            
+
         case "setAdditionalData":
             if let args = call.arguments as? [String: Any],
                let integrationData = args["integrationData"] as? [String: Any] {
@@ -55,7 +55,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Integration data is required", details: nil))
             }
-            
+
         case "trackEvent":
             if let args = call.arguments as? [String: Any],
                let eventName = args["eventName"] as? String {
@@ -65,7 +65,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Event name is required", details: nil))
             }
-            
+
         case "capturePayment":
             if let args = call.arguments as? [String: Any],
                let userId = args["userId"] as? String,
@@ -78,7 +78,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID, amount and payment ID are required", details: nil))
             }
-            
+
         case "removePayment":
             if let args = call.arguments as? [String: Any] {
                 let userId = args["userId"] as? String
@@ -87,10 +87,10 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID or payment ID is required", details: nil))
             }
-            
+
         case "isAvailable":
             result(isInitialized)
-            
+
         case "enablePIIHashing":
             if let args = call.arguments as? [String: Any],
                let enabled = args["enabled"] as? Bool {
@@ -98,7 +98,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "enabled parameter is required", details: nil))
             }
-            
+
         case "setConsent":
             let args = call.arguments as? [String: Any]
             setConsent(args: args ?? [:], result: result)
@@ -127,12 +127,12 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 // Handle empty URL gracefully (matches SDK behavior)
                 result(nil)
             }
-            
+
         default:
             result(FlutterMethodNotImplemented)
         }
     }
-    
+
     private func initNativeSDK(token: String, secretKey: String?, keyId: String?, disableIdfa: Bool?, debug: Bool, result: @escaping FlutterResult) {
         Task {
             do {
@@ -148,20 +148,20 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "INIT_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "INIT_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func getAttributionData(result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         Task {
             do {
                 let attributionData = try await LinkrunnerSDK.shared.getAttributionData()
@@ -171,20 +171,20 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "ATTRIBUTION_DATA_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "ATTRIBUTION_DATA_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func signup(userData: [String: Any], data: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         let userDataObj = UserData(
             id: userData["id"] as? String ?? "",
             name: userData["name"] as? String,
@@ -200,7 +200,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             gaSessionId: userData["ga_session_id"] as? String,
             netcoreDeviceGuid: userData["netcore_device_guid"] as? String
         )
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.signup(userData: userDataObj, additionalData: data)
@@ -209,20 +209,20 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "SIGNUP_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "SIGNUP_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func setUserData(userData: [String: Any], result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         // Convert Flutter dictionary to SDK's UserData (matching Android field names)
         let userDataObj = UserData(
             id: userData["id"] as? String ?? "",
@@ -239,7 +239,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             gaSessionId: userData["ga_session_id"] as? String,
             netcoreDeviceGuid: userData["netcore_device_guid"] as? String
         )
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.setUserData(userDataObj)
@@ -248,25 +248,25 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "SET_USER_DATA_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "SET_USER_DATA_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func setAdditionalData(integrationData: [String: Any], result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         // Convert Flutter dictionary to SDK's IntegrationData (matching Android field names)
         let integrationDataObj = IntegrationData(
             clevertapId: integrationData["clevertap_id"] as? String
         )
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.setAdditionalData(integrationDataObj)
@@ -275,20 +275,20 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "SET_ADDITIONAL_DATA_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "SET_ADDITIONAL_DATA_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func trackEvent(eventName: String, eventData: [String: Any]?, eventId: String?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId)
@@ -297,14 +297,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "TRACK_EVENT_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "TRACK_EVENT_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func capturePayment(userId: String, amount: Double, paymentId: String, type: String, status: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
@@ -330,20 +330,20 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "CAPTURE_PAYMENT_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "CAPTURE_PAYMENT_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func removePayment(userId: String?, paymentId: String?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.removePayment(
@@ -355,14 +355,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "REMOVE_PAYMENT_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "REMOVE_PAYMENT_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
         }
     }
-    
+
     private func enablePIIHashing(enabled: Bool, result: @escaping FlutterResult) {
         LinkrunnerSDK.shared.enablePIIHashing(enabled)
         result(nil)
@@ -384,13 +384,13 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         LinkrunnerSDK.shared.setConsent(consent)
         result(nil)
     }
-    
+
     private func setPushToken(pushToken: String, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         Task {
             do {
                 try await LinkrunnerSDK.shared.setPushToken(pushToken)
@@ -428,19 +428,19 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             }
         }
     }
-    
+
     private func handleDeeplink(deeplinkUrl: String, result: @escaping FlutterResult) {
         // Handle empty URL gracefully (matches SDK behavior)
         if deeplinkUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             result(nil)
             return
         }
-        
+
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
         Task {
             do {
                 let response = try await LinkrunnerSDK.shared.handleDeeplink(url: deeplinkUrl)
@@ -449,8 +449,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    result(FlutterError(code: "HANDLE_DEEPLINK_FAILED", 
-                                      message: error.localizedDescription, 
+                    result(FlutterError(code: "HANDLE_DEEPLINK_FAILED",
+                                      message: error.localizedDescription,
                                       details: nil))
                 }
             }
