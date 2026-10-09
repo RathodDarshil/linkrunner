@@ -1,3 +1,8 @@
+## 4.2.0
+
+- `AttributionData` from `getAttributionData()` now has `gaid` and `idfa`, the advertising identifiers Linkrunner recorded the install with. Use them to join Linkrunner attribution with your own data instead of reading the identifier again on the device. Both are nullable: `gaid` is null on iOS and when no advertising ID is available on Android, and `idfa` is null on Android and when App Tracking Transparency is not authorized on iOS. Existing code compiles unchanged.
+- Requires the bundled native SDKs Android 4.2.0 and iOS LinkrunnerKit 4.2.0, which add these fields.
+
 ## 4.1.2
 
 - Fixed a fatal Android crash from `enablePIIHashing()`: `PlatformException(ENABLE_PII_HASHING_FAILED, Context not set)` reaching `PlatformDispatcher.onError`. The native Android SDK required an application context that is only set inside `init()`, so calling `enablePIIHashing()` before `init()` — or right after an un-awaited `init()` — threw, and the Dart wrapper rethrew into an app that had nothing awaiting the call. Fixed on both sides: the bundled Android SDK is now 4.1.1, where the call is safe before `init()` and the flag is persisted during initialization, and `LinkRunner.enablePIIHashing()` now logs failures instead of rethrowing, since it is a fire-and-forget configuration setter. A pre-`init()` call is also no longer silently discarded. iOS was never affected.

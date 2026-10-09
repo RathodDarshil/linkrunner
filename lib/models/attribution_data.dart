@@ -2,9 +2,17 @@ class AttributionData {
   final String? deeplink;
   final CampaignData campaignData;
 
+  /// Android only.
+  final String? gaid;
+
+  /// iOS only, null when ATT is not authorized.
+  final String? idfa;
+
   AttributionData({
     this.deeplink,
     required this.campaignData,
+    this.gaid,
+    this.idfa,
   });
 
   factory AttributionData.fromJSON(Map<String, dynamic>? json) {
@@ -14,6 +22,8 @@ class AttributionData {
     return AttributionData(
       deeplink: json['deeplink'] as String?,
       campaignData: CampaignData.fromJSON(json['campaign_data'] as Map<String, dynamic>),
+      gaid: json['gaid'] as String?,
+      idfa: json['idfa'] as String?,
     );
   }
 
@@ -21,6 +31,8 @@ class AttributionData {
     return {
       'deeplink': deeplink,
       'campaign_data': campaignData.toJSON(),
+      'gaid': gaid,
+      'idfa': idfa,
     };
   }
 }

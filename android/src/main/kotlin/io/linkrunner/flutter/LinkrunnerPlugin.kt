@@ -237,6 +237,8 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                             
                             // Include the AttributionData fields with proper null safety
                             resultMap["deeplink"] = attributionData.deeplink
+                            resultMap["gaid"] = attributionData.gaid
+                            resultMap["idfa"] = attributionData.idfa
                             
                             // Map campaign data using all fields from CampaignData with null safety
                             val campaignMap = mutableMapOf<String, Any?>()
