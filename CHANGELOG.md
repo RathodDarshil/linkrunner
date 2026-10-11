@@ -47,6 +47,10 @@ await LinkRunner().trackEvent(
 
 `currency` is now required. The user is taken from `setCustomerUserId()` instead of a `userId` per payment, and the old `type` becomes the event name.
 
+### Payment names and dashboard mappings
+
+The event name you pass becomes the payment type in reports and in your dashboard event mappings, and mappings match it exactly. If you used one of the old payment types, pass the same name (in any case, for example `first_payment` or `DEFAULT`). Linkrunner stores it as the uppercase type, so your existing mappings, reports and partner templates keep working with no change. If you pick a new name such as `purchase`, add a mapping for it in the dashboard before you release, or those payments are not sent to ad networks. `capturePayment` without a type was stored as `DEFAULT`.
+
 ## 4.2.0
 
 - `AttributionData` from `getAttributionData()` now has `gaid` and `idfa`, the advertising identifiers Linkrunner recorded the install with. Use them to join Linkrunner attribution with your own data instead of reading the identifier again on the device. Both are nullable: `gaid` is null on iOS and when no advertising ID is available on Android, and `idfa` is null on Android and when App Tracking Transparency is not authorized on iOS. Existing code compiles unchanged.
