@@ -1,9 +1,8 @@
 import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'models/attribution_data.dart';
-import 'models/lr_capture_payment.dart';
 import 'models/lr_consent.dart';
-import 'models/lr_remove_payment.dart';
+import 'models/lr_event_payment.dart';
 import 'models/lr_user_data.dart';
 import 'models/deeplink_data.dart';
 import 'constants.dart';
@@ -177,6 +176,7 @@ class LinkRunnerNativeBridge {
     required String eventName,
     Map<String, dynamic>? eventData,
     String? eventId,
+    EventPayment? payment,
   }) async {
 
     try {
@@ -188,53 +188,14 @@ class LinkRunnerNativeBridge {
       if (eventId != null) {
         arguments['eventId'] = eventId;
       }
+      if (payment != null) {
+        arguments['payment'] = payment.toJSON();
+      }
       
       await _channel.invokeMethod('trackEvent', arguments);
       developer.log('Event tracked successfully: $eventName', name: packageName);
     } on PlatformException catch (e) {
       developer.log('Failed to track event: ${e.message}', 
-          error: e, name: packageName);
-      rethrow;
-    }
-  }
-  
-  /// Capture payment
-  static Future<void> capturePayment({
-    required LRCapturePayment capturePayment,
-  }) async {
-    try {
-      final Map<String, dynamic> arguments = {
-        'userId': capturePayment.userId,
-        'amount': capturePayment.amount,
-        'paymentId': capturePayment.paymentId,
-        'type': capturePayment.type?.name ?? PaymentType.DEFAULT_PAYMENT.name,
-        'status': capturePayment.status?.name ?? PaymentStatus.PAYMENT_COMPLETED.name,
-        'eventData': capturePayment.eventData,
-      };
-      
-      await _channel.invokeMethod('capturePayment', arguments);
-      developer.log('Payment captured successfully', name: packageName);
-    } on PlatformException catch (e) {
-      developer.log('Failed to capture payment: ${e.message}', 
-          error: e, name: packageName);
-      rethrow;
-    }
-  }
-  
-  /// Remove captured payment
-  static Future<void> removePayment({
-    required LRRemovePayment removePayment,
-  }) async {
-    try {
-      final Map<String, dynamic> arguments = {
-        'userId': removePayment.userId,
-        'paymentId': removePayment.paymentId,
-      };
-      
-      await _channel.invokeMethod('removePayment', arguments);
-      developer.log('Payment removed successfully', name: packageName);
-    } on PlatformException catch (e) {
-      developer.log('Failed to remove payment: ${e.message}', 
           error: e, name: packageName);
       rethrow;
     }

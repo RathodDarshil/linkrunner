@@ -1,3 +1,56 @@
+## 5.0.0
+
+Payments are now sent with `trackPayment`. `capturePayment` and `removePayment` are removed.
+
+**Added**
+
+- `LinkRunner().trackPayment(eventName:, paymentId:, userId:, amount:, currency:, status:, eventData:)` replaces `capturePayment`. `eventName` becomes the payment type, so `first_payment`, `purchase`, `subscription_renewed` or any name you already track can carry revenue. `status` defaults to `PaymentStatus.PAYMENT_COMPLETED`. `currency` is a 3-letter ISO 4217 code such as `USD` or `INR`, trimmed and upper-cased. A blank `userId` falls back to the user saved by `signup` or `setUserData`, same as `capturePayment`.
+- `trackPayment` throws `ArgumentError` before anything is sent when `amount` is negative or not finite, `paymentId` is blank, or `currency` is not 3 letters.
+- `trackEvent` also takes an optional `payment: EventPayment(amount:, paymentId:, currency:, userId:, status:)` with the same fields and checks, for when you already build the event yourself. `status` defaults to `PAYMENT_COMPLETED` and is always sent.
+- `EventPayment` and `PaymentStatus` are exported from `package:linkrunner/main.dart`.
+- `trackEvent` calls without `payment` behave exactly as before.
+- Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.0.0` and iOS `LinkrunnerKit 5.0.0`.
+
+**Removed**
+
+- `LinkRunner().capturePayment()`, `LinkRunner().removePayment()`, `LRCapturePayment`, `LRRemovePayment` and `PaymentType`. The `models/lr_capture_payment.dart` and `models/lr_remove_payment.dart` files are gone, so import `PaymentStatus` from `package:linkrunner/main.dart` instead.
+- `removePayment` has no replacement.
+
+**Migration**
+
+Before:
+
+```dart
+await LinkRunner().capturePayment(
+  capturePayment: LRCapturePayment(
+    userId: 'user_123',
+    paymentId: 'order_456',
+    amount: 499.0,
+    type: PaymentType.FIRST_PAYMENT,
+    status: PaymentStatus.PAYMENT_COMPLETED,
+  ),
+);
+```
+
+After:
+
+```dart
+await LinkRunner().trackPayment(
+  eventName: 'first_payment',
+  paymentId: 'order_456',
+  userId: 'user_123',
+  amount: 499.0,
+  currency: 'INR',
+  status: PaymentStatus.PAYMENT_COMPLETED,
+);
+```
+
+The old `type` becomes `eventName`, `currency` is now required, and `userId` stays as it was. If you called `capturePayment` without a `type` (or with `PaymentType.DEFAULT_PAYMENT`), pass `eventName: 'DEFAULT'` to keep the same payment type.
+
+### Payment names and dashboard mappings
+
+The event name you pass becomes the payment type in reports and in your dashboard event mappings, and mappings match it exactly. If you used one of the old payment types, pass the same name (in any case, for example `first_payment` or `DEFAULT`). Linkrunner stores it as the uppercase type, so your existing mappings, reports and partner templates keep working with no change. If you pick a new name such as `purchase`, add a mapping for it in the dashboard before you release, or those payments are not sent to ad networks. `capturePayment` without a type was stored as `DEFAULT`.
+
 ## 4.2.0
 
 - `AttributionData` from `getAttributionData()` now has `gaid` and `idfa`, the advertising identifiers Linkrunner recorded the install with. Use them to join Linkrunner attribution with your own data instead of reading the identifier again on the device. Both are nullable: `gaid` is null on iOS and when no advertising ID is available on Android, and `idfa` is null on Android and when App Tracking Transparency is not authorized on iOS. Existing code compiles unchanged.

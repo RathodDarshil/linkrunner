@@ -1,9 +1,8 @@
 import 'dart:developer' as developer;
 
 import 'package:linkrunner/models/attribution_data.dart';
-import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_consent.dart';
-import 'package:linkrunner/models/lr_remove_payment.dart';
+import 'package:linkrunner/models/lr_event_payment.dart';
 import 'package:linkrunner/models/deeplink_data.dart';
 
 import 'constants.dart';
@@ -13,7 +12,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.2.0';
+  final String packageVersion = '5.0.0';
 
   String? token;
 
@@ -131,50 +130,14 @@ class LinkRunner {
     }
   }
 
-  Future<void> capturePayment({
-    required LRCapturePayment capturePayment,
-  }) async {
-    try {
-      await LinkRunnerNativeBridge.capturePayment(
-          capturePayment: capturePayment);
-
-      developer.log('Linkrunner: Payment captured successfully 💸');
-
-      return;
-    } catch (e) {
-      developer.log(
-        'Linkrunner: Payment captured failed',
-        name: packageName,
-        error: e,
-      );
-      return;
-    }
-  }
-
-  Future<void> removePayment({
-    required LRRemovePayment removePayment,
-  }) async {
-    try {
-      await LinkRunnerNativeBridge.removePayment(removePayment: removePayment);
-
-      return;
-    } catch (e) {
-      developer.log(
-        'Linkrunner: Payment removed failed',
-        name: packageName,
-        error: e,
-      );
-      return;
-    }
-  }
-
-
   //  [eventId] - Optional event identifier. Accepts [String] or [num] (int/double).
   //  Numbers will be automatically converted to strings.
+  //  [payment] - Optional revenue; when set the event is stored as a payment named [eventName].
   Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
     Object? eventId,
+    EventPayment? payment,
   }) async {
     try {
       String? convertedEventId;
@@ -189,7 +152,10 @@ class LinkRunner {
       }
       
       await LinkRunnerNativeBridge.trackEvent(
-          eventName: eventName, eventData: eventData, eventId: convertedEventId);
+          eventName: eventName,
+          eventData: eventData,
+          eventId: convertedEventId,
+          payment: payment);
 
       developer.log('Linkrunner: Event tracked successfully > $eventName');
 
@@ -203,6 +169,29 @@ class LinkRunner {
 
       rethrow;
     }
+  }
+
+  /// Track a payment; [eventName] becomes the payment type in reports and dashboard mappings.
+  Future<void> trackPayment({
+    required String eventName,
+    required String paymentId,
+    required String userId,
+    required double amount,
+    required String currency,
+    PaymentStatus status = PaymentStatus.PAYMENT_COMPLETED,
+    Map<String, dynamic>? eventData,
+  }) async {
+    await trackEvent(
+      eventName: eventName,
+      eventData: eventData,
+      payment: EventPayment(
+        amount: amount,
+        paymentId: paymentId,
+        currency: currency,
+        userId: userId,
+        status: status,
+      ),
+    );
   }
 
   /// Enable or disable PII (Personally Identifiable Information) hashing
