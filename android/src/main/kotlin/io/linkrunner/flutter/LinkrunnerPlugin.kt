@@ -16,10 +16,10 @@ import kotlinx.coroutines.withContext
 // Import the native LinkRunner SDK classes
 import io.linkrunner.sdk.LinkRunner as NativeLinkRunner
 import io.linkrunner.sdk.models.ConsentStatus
+import io.linkrunner.sdk.models.EventPayment
+import io.linkrunner.sdk.models.PaymentStatus
 import io.linkrunner.sdk.models.LinkrunnerConsent
 import io.linkrunner.sdk.models.request.UserDataRequest
-import io.linkrunner.sdk.models.request.CapturePaymentRequest
-import io.linkrunner.sdk.models.request.RemovePaymentRequest
 import io.linkrunner.sdk.models.IntegrationData
 
 
@@ -86,29 +86,12 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 val eventName = call.argument<String>("eventName")
                 val eventData = call.argument<Map<String, Any>>("eventData")
                 val eventId = call.argument<String?>("eventId")
+                val payment = call.argument<Map<String, Any?>>("payment")
                 if (eventName != null) {
-                    trackEvent(eventName, eventData, eventId, result)
+                    trackEvent(eventName, eventData, eventId, payment, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Event name is required", null)
                 }
-            }
-            "capturePayment" -> {
-                val userId = call.argument<String>("userId")
-                val amount = call.argument<Double>("amount")
-                val paymentId = call.argument<String>("paymentId")
-                val type = call.argument<String>("type") ?: "DEFAULT"
-                val status = call.argument<String>("status") ?: "PAYMENT_COMPLETED"
-                val eventData = call.argument<Map<String, Any>>("eventData")
-                if (userId != null && amount != null) {
-                    capturePayment(userId, amount, paymentId, type, status, eventData, result)
-                } else {
-                    result.error("INVALID_ARGUMENT", "User ID and amount are required", null)
-                }
-            }
-            "removePayment" -> {
-                val userId = call.argument<String>("userId")
-                val paymentId = call.argument<String>("paymentId")
-                removePayment(userId, paymentId, result)
             }
             "isAvailable" -> {
                 result.success(nativeLinkRunner != null)
@@ -347,10 +330,21 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun trackEvent(eventName: String, eventData: Map<String, Any>?, eventId: String?, result: Result) {
+    private fun trackEvent(eventName: String, eventData: Map<String, Any>?, eventId: String?, payment: Map<String, Any?>?, result: Result) {
+        val eventPayment = try {
+            payment?.let { toEventPayment(it) }
+        } catch (e: IllegalArgumentException) {
+            result.error("INVALID_ARGUMENT", e.message ?: "Invalid payment", null)
+            return
+        }
+
         pluginScope.launch {
             try {
-                val trackResult = NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId)
+                val trackResult = if (eventPayment != null) {
+                    NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId, eventPayment)
+                } else {
+                    NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId)
+                }
                 
                 withContext(Dispatchers.Main) {
                     if (trackResult.isSuccess) {
@@ -368,75 +362,18 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, eventData: Map<String, Any>?, result: Result) {
-        pluginScope.launch {
-            try {
-                // Convert string to enum types
-                val paymentType = try {
-                    io.linkrunner.sdk.models.PaymentType.valueOf(type)
-                } catch (e: IllegalArgumentException) {
-                    io.linkrunner.sdk.models.PaymentType.DEFAULT
-                }
-
-                val paymentStatus = try {
-                    io.linkrunner.sdk.models.PaymentStatus.valueOf(status)
-                } catch (e: IllegalArgumentException) {
-                    io.linkrunner.sdk.models.PaymentStatus.PAYMENT_COMPLETED
-                }
-
-                val capturePaymentRequest = CapturePaymentRequest(
-                    paymentId = paymentId ?: "",
-                    userId = userId,
-                    amount = amount,
-                    type = paymentType,
-                    status = paymentStatus,
-                    eventData = eventData
-                )
-                
-                
-                val captureResult = NativeLinkRunner.getInstance().capturePayment(capturePaymentRequest)
-                
-                withContext(Dispatchers.Main) {
-                    if (captureResult.isSuccess) {
-                        result.success(null)
-                    } else {
-                        val error = captureResult.exceptionOrNull()
-                        result.error("CAPTURE_PAYMENT_FAILED", error?.message ?: "Capture payment failed", null)
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    result.error("CAPTURE_PAYMENT_EXCEPTION", e.message, null)
-                }
-            }
+    private fun toEventPayment(payment: Map<String, Any?>): EventPayment {
+        val amount = (payment["amount"] as? Number)?.toDouble()
+            ?: throw IllegalArgumentException("amount is required")
+        val paymentId = payment["paymentId"] as? String
+            ?: throw IllegalArgumentException("paymentId is required")
+        val currency = payment["currency"] as? String
+            ?: throw IllegalArgumentException("currency is required")
+        val status = (payment["status"] as? String)?.let { name ->
+            PaymentStatus.values().firstOrNull { it.name == name }
+                ?: throw IllegalArgumentException("Unknown payment status: $name")
         }
-    }
-
-    private fun removePayment(userId: String?, paymentId: String?, result: Result) {
-        pluginScope.launch {
-            try {
-                val removePaymentRequest = RemovePaymentRequest(
-                    paymentId = paymentId,
-                    userId = userId
-                )
-                
-                
-                val removeResult = NativeLinkRunner.getInstance().removePayment(removePaymentRequest)
-                
-                withContext(Dispatchers.Main) {
-                    if (removeResult.isSuccess) {
-                        result.success(null)
-                    } else {
-                        val error = removeResult.exceptionOrNull()
-                        result.error("REMOVE_PAYMENT_FAILED", error?.message ?: "Remove payment failed", null)
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    result.error("REMOVE_PAYMENT_EXCEPTION", e.message, null)
-                }
-            }
-        }
+        return EventPayment(amount, paymentId, currency, status)
     }
 
     private fun convertToNativeUserData(userData: Map<String, Any>): UserDataRequest {

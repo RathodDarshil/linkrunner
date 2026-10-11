@@ -61,31 +61,10 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                let eventName = args["eventName"] as? String {
                 let eventData = args["eventData"] as? [String: Any]
                 let eventId = args["eventId"] as? String
-                trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, result: result)
+                let payment = args["payment"] as? [String: Any]
+                trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, payment: payment, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Event name is required", details: nil))
-            }
-            
-        case "capturePayment":
-            if let args = call.arguments as? [String: Any],
-               let userId = args["userId"] as? String,
-               let amount = args["amount"] as? Double,
-               let paymentId = args["paymentId"] as? String, !paymentId.isEmpty {
-                let type = args["type"] as? String ?? "DEFAULT_PAYMENT"
-                let status = args["status"] as? String ?? "PAYMENT_COMPLETED"
-                let eventData = args["eventData"] as? [String: Any]
-                capturePayment(userId: userId, amount: amount, paymentId: paymentId, type: type, status: status, eventData: eventData, result: result)
-            } else {
-                result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID, amount and payment ID are required", details: nil))
-            }
-            
-        case "removePayment":
-            if let args = call.arguments as? [String: Any] {
-                let userId = args["userId"] as? String
-                let paymentId = args["paymentId"] as? String
-                removePayment(userId: userId, paymentId: paymentId, result: result)
-            } else {
-                result(FlutterError(code: "INVALID_ARGUMENT", message: "User ID or payment ID is required", details: nil))
             }
             
         case "isAvailable":
@@ -283,15 +262,27 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func trackEvent(eventName: String, eventData: [String: Any]?, eventId: String?, result: @escaping FlutterResult) {
+    private func trackEvent(eventName: String, eventData: [String: Any]?, eventId: String?, payment: [String: Any]?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-        
+
+        let eventPayment: LinkrunnerKit.EventPayment?
+        do {
+            eventPayment = try payment.map { try makeEventPayment($0) }
+        } catch {
+            result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid payment: \(error)", details: nil))
+            return
+        }
+
         Task {
             do {
-                try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId)
+                if let eventPayment = eventPayment {
+                    try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, payment: eventPayment)
+                } else {
+                    try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId)
+                }
                 DispatchQueue.main.async {
                     result(nil)
                 }
@@ -305,64 +296,20 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func capturePayment(userId: String, amount: Double, paymentId: String, type: String, status: String, eventData: [String: Any]?, result: @escaping FlutterResult) {
-        guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
-            return
-        }
-
-        // Convert string enum values to iOS SDK enum types
-        let paymentType = LinkrunnerKit.PaymentType(rawValue: type) ?? LinkrunnerKit.PaymentType.default
-        let paymentStatus = LinkrunnerKit.PaymentStatus(rawValue: status) ?? LinkrunnerKit.PaymentStatus.completed
-
-        Task {
-            do {
-                try await LinkrunnerSDK.shared.capturePayment(
-                    amount: amount,
-                    userId: userId,
-                    paymentId: paymentId,
-                    type: paymentType,
-                    status: paymentStatus,
-                    eventData: eventData
-                )
-                DispatchQueue.main.async {
-                    result(nil)
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    result(FlutterError(code: "CAPTURE_PAYMENT_FAILED", 
-                                      message: error.localizedDescription, 
-                                      details: nil))
-                }
+    private func makeEventPayment(_ payment: [String: Any]) throws -> LinkrunnerKit.EventPayment {
+        guard let amount = (payment["amount"] as? NSNumber)?.doubleValue else { throw LinkrunnerKit.EventPaymentError.invalidAmount }
+        guard let paymentId = payment["paymentId"] as? String else { throw LinkrunnerKit.EventPaymentError.invalidPaymentId }
+        guard let currency = payment["currency"] as? String else { throw LinkrunnerKit.EventPaymentError.invalidCurrency }
+        var status: LinkrunnerKit.PaymentStatus?
+        if let rawStatus = payment["status"] as? String {
+            guard let parsed = LinkrunnerKit.PaymentStatus(rawValue: rawStatus) else {
+                throw NSError(domain: "linkrunner", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown payment status: \(rawStatus)"])
             }
+            status = parsed
         }
+        return try LinkrunnerKit.EventPayment(amount: amount, paymentId: paymentId, currency: currency, status: status)
     }
-    
-    private func removePayment(userId: String?, paymentId: String?, result: @escaping FlutterResult) {
-        guard isInitialized else {
-            result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
-            return
-        }
-        
-        Task {
-            do {
-                try await LinkrunnerSDK.shared.removePayment(
-                    userId: userId ?? "",
-                    paymentId: paymentId
-                )
-                DispatchQueue.main.async {
-                    result(nil)
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    result(FlutterError(code: "REMOVE_PAYMENT_FAILED", 
-                                      message: error.localizedDescription, 
-                                      details: nil))
-                }
-            }
-        }
-    }
-    
+
     private func enablePIIHashing(enabled: Bool, result: @escaping FlutterResult) {
         LinkrunnerSDK.shared.enablePIIHashing(enabled)
         result(nil)

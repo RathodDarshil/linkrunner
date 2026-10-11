@@ -1,3 +1,52 @@
+## 5.0.0
+
+Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` are removed.
+
+**Added**
+
+- `trackEvent` takes an optional `payment: EventPayment(...)`. When it is set, the event is stored as a payment and the event name becomes the payment type, so `purchase`, `subscription_renewed` or any name you already track can carry revenue.
+- `EventPayment` has `amount`, `paymentId`, `currency` (3-letter ISO 4217 code such as `USD` or `INR`) and an optional `status` (`PaymentStatus`). It throws `ArgumentError` when `amount` is negative or not finite, `paymentId` is blank, or `currency` is not 3 letters. The currency is trimmed and upper-cased.
+- `EventPayment` and `PaymentStatus` are exported from `package:linkrunner/main.dart`.
+- `trackEvent` calls without `payment` behave exactly as before.
+- Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.0.0` and iOS `LinkrunnerKit 5.0.0`.
+
+**Removed**
+
+- `LinkRunner().capturePayment()`, `LinkRunner().removePayment()`, `LRCapturePayment`, `LRRemovePayment` and `PaymentType`. The `models/lr_capture_payment.dart` and `models/lr_remove_payment.dart` files are gone, so import `PaymentStatus` from `package:linkrunner/main.dart` instead.
+- `removePayment` has no replacement.
+
+**Migration**
+
+Before:
+
+```dart
+await LinkRunner().capturePayment(
+  capturePayment: LRCapturePayment(
+    userId: 'user_123',
+    paymentId: 'order_456',
+    amount: 499.0,
+    type: PaymentType.FIRST_PAYMENT,
+    status: PaymentStatus.PAYMENT_COMPLETED,
+  ),
+);
+```
+
+After:
+
+```dart
+await LinkRunner().trackEvent(
+  eventName: 'first_payment',
+  payment: EventPayment(
+    amount: 499.0,
+    paymentId: 'order_456',
+    currency: 'INR',
+    status: PaymentStatus.PAYMENT_COMPLETED,
+  ),
+);
+```
+
+`currency` is now required. The user is taken from `setCustomerUserId()` instead of a `userId` per payment, and the old `type` becomes the event name.
+
 ## 4.2.0
 
 - `AttributionData` from `getAttributionData()` now has `gaid` and `idfa`, the advertising identifiers Linkrunner recorded the install with. Use them to join Linkrunner attribution with your own data instead of reading the identifier again on the device. Both are nullable: `gaid` is null on iOS and when no advertising ID is available on Android, and `idfa` is null on Android and when App Tracking Transparency is not authorized on iOS. Existing code compiles unchanged.
