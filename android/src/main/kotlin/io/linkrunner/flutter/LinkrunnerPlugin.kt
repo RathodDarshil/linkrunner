@@ -369,11 +369,13 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             ?: throw IllegalArgumentException("paymentId is required")
         val currency = payment["currency"] as? String
             ?: throw IllegalArgumentException("currency is required")
+        val userId = payment["userId"] as? String
+            ?: throw IllegalArgumentException("userId is required")
         val status = (payment["status"] as? String)?.let { name ->
             PaymentStatus.values().firstOrNull { it.name == name }
                 ?: throw IllegalArgumentException("Unknown payment status: $name")
-        }
-        return EventPayment(amount, paymentId, currency, status)
+        } ?: PaymentStatus.PAYMENT_COMPLETED
+        return EventPayment(amount, paymentId, currency, userId, status)
     }
 
     private fun convertToNativeUserData(userData: Map<String, Any>): UserDataRequest {

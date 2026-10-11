@@ -12,13 +12,16 @@ class EventPayment {
   final double amount;
   final String paymentId;
   final String currency;
-  final PaymentStatus? status;
+  /// A blank value falls back to the user saved by signup or setUserData.
+  final String userId;
+  final PaymentStatus status;
 
   EventPayment({
     required this.amount,
     required this.paymentId,
     required String currency,
-    this.status,
+    required this.userId,
+    this.status = PaymentStatus.PAYMENT_COMPLETED,
   }) : currency = currency.trim().toUpperCase() {
     if (!amount.isFinite || amount < 0) {
       throw ArgumentError.value(amount, 'amount', 'must be a finite number >= 0');
@@ -32,14 +35,12 @@ class EventPayment {
   }
 
   Map<String, dynamic> toJSON() {
-    final json = <String, dynamic>{
+    return <String, dynamic>{
       'amount': amount,
       'paymentId': paymentId,
       'currency': currency,
+      'userId': userId,
+      'status': status.name,
     };
-    if (status != null) {
-      json['status'] = status!.name;
-    }
-    return json;
   }
 }

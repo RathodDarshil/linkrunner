@@ -300,14 +300,17 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         guard let amount = (payment["amount"] as? NSNumber)?.doubleValue else { throw LinkrunnerKit.EventPaymentError.invalidAmount }
         guard let paymentId = payment["paymentId"] as? String else { throw LinkrunnerKit.EventPaymentError.invalidPaymentId }
         guard let currency = payment["currency"] as? String else { throw LinkrunnerKit.EventPaymentError.invalidCurrency }
-        var status: LinkrunnerKit.PaymentStatus?
+        guard let userId = payment["userId"] as? String else {
+            throw NSError(domain: "linkrunner", code: 0, userInfo: [NSLocalizedDescriptionKey: "userId is required"])
+        }
+        var status: LinkrunnerKit.PaymentStatus = .completed
         if let rawStatus = payment["status"] as? String {
             guard let parsed = LinkrunnerKit.PaymentStatus(rawValue: rawStatus) else {
                 throw NSError(domain: "linkrunner", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown payment status: \(rawStatus)"])
             }
             status = parsed
         }
-        return try LinkrunnerKit.EventPayment(amount: amount, paymentId: paymentId, currency: currency, status: status)
+        return try LinkrunnerKit.EventPayment(amount: amount, paymentId: paymentId, currency: currency, userId: userId, status: status)
     }
 
     private func enablePIIHashing(enabled: Bool, result: @escaping FlutterResult) {

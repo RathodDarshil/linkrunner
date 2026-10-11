@@ -1,11 +1,12 @@
 ## 5.0.0
 
-Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` are removed.
+Payments are now sent with `trackPayment`. `capturePayment` and `removePayment` are removed.
 
 **Added**
 
-- `trackEvent` takes an optional `payment: EventPayment(...)`. When it is set, the event is stored as a payment and the event name becomes the payment type, so `purchase`, `subscription_renewed` or any name you already track can carry revenue.
-- `EventPayment` has `amount`, `paymentId`, `currency` (3-letter ISO 4217 code such as `USD` or `INR`) and an optional `status` (`PaymentStatus`). It throws `ArgumentError` when `amount` is negative or not finite, `paymentId` is blank, or `currency` is not 3 letters. The currency is trimmed and upper-cased.
+- `LinkRunner().trackPayment(eventName:, paymentId:, userId:, amount:, currency:, status:, eventData:)` replaces `capturePayment`. `eventName` becomes the payment type, so `first_payment`, `purchase`, `subscription_renewed` or any name you already track can carry revenue. `status` defaults to `PaymentStatus.PAYMENT_COMPLETED`. `currency` is a 3-letter ISO 4217 code such as `USD` or `INR`, trimmed and upper-cased. A blank `userId` falls back to the user saved by `signup` or `setUserData`, same as `capturePayment`.
+- `trackPayment` throws `ArgumentError` before anything is sent when `amount` is negative or not finite, `paymentId` is blank, or `currency` is not 3 letters.
+- `trackEvent` also takes an optional `payment: EventPayment(amount:, paymentId:, currency:, userId:, status:)` with the same fields and checks, for when you already build the event yourself. `status` defaults to `PAYMENT_COMPLETED` and is always sent.
 - `EventPayment` and `PaymentStatus` are exported from `package:linkrunner/main.dart`.
 - `trackEvent` calls without `payment` behave exactly as before.
 - Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.0.0` and iOS `LinkrunnerKit 5.0.0`.
@@ -34,18 +35,17 @@ await LinkRunner().capturePayment(
 After:
 
 ```dart
-await LinkRunner().trackEvent(
+await LinkRunner().trackPayment(
   eventName: 'first_payment',
-  payment: EventPayment(
-    amount: 499.0,
-    paymentId: 'order_456',
-    currency: 'INR',
-    status: PaymentStatus.PAYMENT_COMPLETED,
-  ),
+  paymentId: 'order_456',
+  userId: 'user_123',
+  amount: 499.0,
+  currency: 'INR',
+  status: PaymentStatus.PAYMENT_COMPLETED,
 );
 ```
 
-`currency` is now required. The user is taken from `setCustomerUserId()` instead of a `userId` per payment, and the old `type` becomes the event name.
+The old `type` becomes `eventName`, `currency` is now required, and `userId` stays as it was. If you called `capturePayment` without a `type` (or with `PaymentType.DEFAULT_PAYMENT`), pass `eventName: 'DEFAULT'` to keep the same payment type.
 
 ### Payment names and dashboard mappings
 

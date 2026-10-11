@@ -171,6 +171,29 @@ class LinkRunner {
     }
   }
 
+  /// Track a payment; [eventName] becomes the payment type in reports and dashboard mappings.
+  Future<void> trackPayment({
+    required String eventName,
+    required String paymentId,
+    required String userId,
+    required double amount,
+    required String currency,
+    PaymentStatus status = PaymentStatus.PAYMENT_COMPLETED,
+    Map<String, dynamic>? eventData,
+  }) async {
+    await trackEvent(
+      eventName: eventName,
+      eventData: eventData,
+      payment: EventPayment(
+        amount: amount,
+        paymentId: paymentId,
+        currency: currency,
+        userId: userId,
+        status: status,
+      ),
+    );
+  }
+
   /// Enable or disable PII (Personally Identifiable Information) hashing
   /// When enabled, sensitive user data like name, email, and phone will be hashed using SHA-256
   /// before being sent to the server
