@@ -186,7 +186,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
         
         let userDataObj = UserData(
-            id: userData["id"] as? String ?? "",
+            id: userData["id"] as? String,
             name: userData["name"] as? String,
             phone: userData["phone"] as? String,
             email: userData["email"] as? String,
@@ -198,7 +198,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             brazeDeviceId: userData["braze_device_id"] as? String,
             gaAppInstanceId: userData["ga_app_instance_id"] as? String,
             gaSessionId: userData["ga_session_id"] as? String,
-            netcoreDeviceGuid: userData["netcore_device_guid"] as? String
+            netcoreDeviceGuid: userData["netcore_device_guid"] as? String,
+            moengageUserId: userData["moengage_user_id"] as? String
         )
         
         Task {
@@ -225,7 +226,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         
         // Convert Flutter dictionary to SDK's UserData (matching Android field names)
         let userDataObj = UserData(
-            id: userData["id"] as? String ?? "",
+            id: userData["id"] as? String,
             name: userData["name"] as? String,
             phone: userData["phone"] as? String,
             email: userData["email"] as? String,
@@ -237,7 +238,8 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
             brazeDeviceId: userData["braze_device_id"] as? String,
             gaAppInstanceId: userData["ga_app_instance_id"] as? String,
             gaSessionId: userData["ga_session_id"] as? String,
-            netcoreDeviceGuid: userData["netcore_device_guid"] as? String
+            netcoreDeviceGuid: userData["netcore_device_guid"] as? String,
+            moengageUserId: userData["moengage_user_id"] as? String
         )
         
         Task {

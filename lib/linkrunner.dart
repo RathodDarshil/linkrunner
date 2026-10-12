@@ -13,7 +13,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.2.0';
+  final String packageVersion = '4.3.0';
 
   String? token;
 
@@ -74,6 +74,10 @@ class LinkRunner {
     required LRUserData userData,
     Map<String, dynamic>? data,
   }) async {
+    final customerUserId = userData.id;
+    if (customerUserId == null || customerUserId.isEmpty) {
+      throw ArgumentError.value(userData.id, 'userData.id', 'is required for signup');
+    }
     try {
       await LinkRunnerNativeBridge.signup(userData: userData, data: data);
 
@@ -91,6 +95,10 @@ class LinkRunner {
     }
   }
 
+  /// Sets user data for this install. Can be called right after `init`: `userData.id`
+  /// is optional, so you can pass only analytics ids (Mixpanel, Amplitude, PostHog, ...)
+  /// before your app knows the user. Linkrunner then sets its attribution properties on
+  /// those tools' profiles.
   Future<void> setUserData({
     required LRUserData userData,
   }) async {

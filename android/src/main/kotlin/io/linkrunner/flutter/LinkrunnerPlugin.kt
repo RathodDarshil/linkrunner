@@ -441,7 +441,8 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
 
     private fun convertToNativeUserData(userData: Map<String, Any>): UserDataRequest {
         return UserDataRequest(
-            id = userData["id"] as? String ?: "",
+            // Missing id stays null: setUserData accepts it, the native signup rejects it.
+            id = userData["id"] as? String,
             name = userData["name"] as? String,
             email = userData["email"] as? String,
             phone = userData["phone"] as? String,
@@ -453,7 +454,8 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
             gaSessionId = userData["ga_session_id"] as? String,
             netcoreDeviceGuid = userData["netcore_device_guid"] as? String,
             userCreatedAt = userData["user_created_at"] as? String,
-            isFirstTimeUser = userData["is_first_time_user"] as? Boolean
+            isFirstTimeUser = userData["is_first_time_user"] as? Boolean,
+            moengageUserId = userData["moengage_user_id"] as? String
         )
     }
 
