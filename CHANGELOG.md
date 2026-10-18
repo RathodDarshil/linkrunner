@@ -1,3 +1,7 @@
+## 4.3.1
+
+- Bumped the bundled native Android SDK to 4.3.1. Keystore work and blocking disk writes no longer run on the calling thread, a normal app launch does no Keystore write, and the WebView user agent is cached so it is not rebuilt on every cold start. No Dart or API changes. iOS is unchanged (LinkrunnerKit 4.3.0).
+
 ## 4.3.0
 
 - `setUserData` no longer needs a customer user id, so it can be called right after `init`. `LRUserData.id` is now optional (`String?`, no longer `required`): pass only the analytics ids you have (for example `mixpanelDistinctId`, `amplitudeDeviceId`, `posthogDistinctId`) and add `id` later, once your app knows the user. Linkrunner sets its attribution properties (`lr_campaign`, `lr_ad_network`) on the profiles of the analytics tools you identified, when that integration is configured for your project. Existing `LRUserData(id: ...)` calls compile unchanged; code that reads `userData.id` now gets a nullable value.
