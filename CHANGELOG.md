@@ -1,3 +1,7 @@
+## 4.3.2
+
+- Bumped the bundled native Android SDK to 4.3.2. Fixes a launch crash (`NoSuchMethodException: androidx.work.impl.WorkDatabase_Impl.<init>`) in Android release builds shrunk by R8 on Android Gradle Plugin 9, for example Expo 58 release builds where shrinking is on by default. With only that crash patched, `init`, `signup`, `trackEvent`, `capturePayment` and the other queued calls were never sent. The native SDK's consumer ProGuard rules now keep the constructors WorkManager creates by reflection, so apps need no rule of their own. No Dart or API changes. iOS is unchanged (LinkrunnerKit 4.3.0).
+
 ## 4.3.1
 
 - Bumped the bundled native Android SDK to 4.3.1. Keystore work and blocking disk writes no longer run on the calling thread, a normal app launch does no Keystore write, and the WebView user agent is cached so it is not rebuilt on every cold start. No Dart or API changes. iOS is unchanged (LinkrunnerKit 4.3.0).
