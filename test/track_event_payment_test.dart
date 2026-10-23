@@ -108,7 +108,7 @@ void main() {
   group('trackPayment', () {
     test('sends a trackEvent call carrying the payment and userId', () async {
       await LinkRunner().trackPayment(
-        eventName: 'first_payment',
+        eventName: 'FIRST_PAYMENT',
         paymentId: 'order_456',
         userId: 'user_123',
         amount: 499.0,
@@ -120,7 +120,7 @@ void main() {
       expect(calls, hasLength(1));
       expect(calls.single.method, 'trackEvent');
       expect(calls.single.arguments, {
-        'eventName': 'first_payment',
+        'eventName': 'FIRST_PAYMENT',
         'eventData': {'plan': 'pro'},
         'payment': {
           'amount': 499.0,
