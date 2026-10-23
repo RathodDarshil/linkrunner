@@ -51,6 +51,22 @@ The old `type` becomes `eventName`, `currency` is now required, and `userId` sta
 
 The event name you pass becomes the payment type in reports and in your dashboard event mappings, and mappings match it exactly. If you used one of the old payment types, pass the same name (in any case, for example `first_payment` or `DEFAULT`). Linkrunner stores it as the uppercase type, so your existing mappings, reports and partner templates keep working with no change. If you pick a new name such as `purchase`, add a mapping for it in the dashboard before you release, or those payments are not sent to ad networks. `capturePayment` without a type was stored as `DEFAULT`.
 
+## 4.3.2
+
+- Bumped the bundled native Android SDK to 4.3.2. Fixes a launch crash (`NoSuchMethodException: androidx.work.impl.WorkDatabase_Impl.<init>`) in Android release builds shrunk by R8 on Android Gradle Plugin 9, for example Expo 58 release builds where shrinking is on by default. With only that crash patched, `init`, `signup`, `trackEvent`, `capturePayment` and the other queued calls were never sent. The native SDK's consumer ProGuard rules now keep the constructors WorkManager creates by reflection, so apps need no rule of their own. No Dart or API changes. iOS is unchanged (LinkrunnerKit 4.3.0).
+
+## 4.3.1
+
+- Bumped the bundled native Android SDK to 4.3.1. Keystore work and blocking disk writes no longer run on the calling thread, a normal app launch does no Keystore write, and the WebView user agent is cached so it is not rebuilt on every cold start. No Dart or API changes. iOS is unchanged (LinkrunnerKit 4.3.0).
+
+## 4.3.0
+
+- `setUserData` no longer needs a customer user id, so it can be called right after `init`. `LRUserData.id` is now optional (`String?`, no longer `required`): pass only the analytics ids you have (for example `mixpanelDistinctId`, `amplitudeDeviceId`, `posthogDistinctId`) and add `id` later, once your app knows the user. Linkrunner sets its attribution properties (`lr_campaign`, `lr_ad_network`) on the profiles of the analytics tools you identified, when that integration is configured for your project. Existing `LRUserData(id: ...)` calls compile unchanged; code that reads `userData.id` now gets a nullable value.
+- `signup` still requires `id` and now throws an `ArgumentError` when it is missing or empty.
+- A `setUserData` call without `id` no longer clears the stored customer user id on either platform (the bridges used to send `""`), so custom events keep their `user_id`.
+- Added `LRUserData.moengageUserId`, so MoEngage profiles receive Linkrunner attribution.
+- Requires the bundled native SDKs Android 4.3.0 and iOS LinkrunnerKit 4.3.0.
+
 ## 4.2.0
 
 - `AttributionData` from `getAttributionData()` now has `gaid` and `idfa`, the advertising identifiers Linkrunner recorded the install with. Use them to join Linkrunner attribution with your own data instead of reading the identifier again on the device. Both are nullable: `gaid` is null on iOS and when no advertising ID is available on Android, and `idfa` is null on Android and when App Tracking Transparency is not authorized on iOS. Existing code compiles unchanged.
@@ -118,7 +134,6 @@ The event name you pass becomes the payment type in reports and in your dashboar
 ## 3.7.0
 
 - Added eventData parameter to capture payment method to support meta commerce event manager
-
 
 ## 3.6.3
 
