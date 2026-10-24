@@ -61,8 +61,7 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                let eventName = args["eventName"] as? String {
                 let eventData = args["eventData"] as? [String: Any]
                 let eventId = args["eventId"] as? String
-                let payment = args["payment"] as? [String: Any]
-                trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, payment: payment, result: result)
+                trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Event name is required", details: nil))
             }
@@ -264,27 +263,17 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func trackEvent(eventName: String, eventData: [String: Any]?, eventId: String?, payment: [String: Any]?, result: @escaping FlutterResult) {
+
+
+    private func trackEvent(eventName: String, eventData: [String: Any]?, eventId: String?, result: @escaping FlutterResult) {
         guard isInitialized else {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized", details: nil))
             return
         }
-
-        let eventPayment: LinkrunnerKit.EventPayment?
-        do {
-            eventPayment = try payment.map { try makeEventPayment($0) }
-        } catch {
-            result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid payment: \(error)", details: nil))
-            return
-        }
-
+        
         Task {
             do {
-                if let eventPayment = eventPayment {
-                    try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId, payment: eventPayment)
-                } else {
-                    try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId)
-                }
+                try await LinkrunnerSDK.shared.trackEvent(eventName: eventName, eventData: eventData, eventId: eventId)
                 DispatchQueue.main.async {
                     result(nil)
                 }
@@ -296,23 +285,6 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 }
             }
         }
-    }
-    
-    private func makeEventPayment(_ payment: [String: Any]) throws -> LinkrunnerKit.EventPayment {
-        guard let amount = (payment["amount"] as? NSNumber)?.doubleValue else { throw LinkrunnerKit.EventPaymentError.invalidAmount }
-        guard let paymentId = payment["paymentId"] as? String else { throw LinkrunnerKit.EventPaymentError.invalidPaymentId }
-        guard let currency = payment["currency"] as? String else { throw LinkrunnerKit.EventPaymentError.invalidCurrency }
-        guard let userId = payment["userId"] as? String else {
-            throw NSError(domain: "linkrunner", code: 0, userInfo: [NSLocalizedDescriptionKey: "userId is required"])
-        }
-        var status: LinkrunnerKit.PaymentStatus = .completed
-        if let rawStatus = payment["status"] as? String {
-            guard let parsed = LinkrunnerKit.PaymentStatus(rawValue: rawStatus) else {
-                throw NSError(domain: "linkrunner", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unknown payment status: \(rawStatus)"])
-            }
-            status = parsed
-        }
-        return try LinkrunnerKit.EventPayment(amount: amount, paymentId: paymentId, currency: currency, userId: userId, status: status)
     }
 
     private func enablePIIHashing(enabled: Bool, result: @escaping FlutterResult) {

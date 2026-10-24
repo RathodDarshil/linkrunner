@@ -16,8 +16,6 @@ import kotlinx.coroutines.withContext
 // Import the native LinkRunner SDK classes
 import io.linkrunner.sdk.LinkRunner as NativeLinkRunner
 import io.linkrunner.sdk.models.ConsentStatus
-import io.linkrunner.sdk.models.EventPayment
-import io.linkrunner.sdk.models.PaymentStatus
 import io.linkrunner.sdk.models.LinkrunnerConsent
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.IntegrationData
@@ -86,9 +84,8 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 val eventName = call.argument<String>("eventName")
                 val eventData = call.argument<Map<String, Any>>("eventData")
                 val eventId = call.argument<String?>("eventId")
-                val payment = call.argument<Map<String, Any?>>("payment")
                 if (eventName != null) {
-                    trackEvent(eventName, eventData, eventId, payment, result)
+                    trackEvent(eventName, eventData, eventId, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Event name is required", null)
                 }
@@ -330,21 +327,10 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun trackEvent(eventName: String, eventData: Map<String, Any>?, eventId: String?, payment: Map<String, Any?>?, result: Result) {
-        val eventPayment = try {
-            payment?.let { toEventPayment(it) }
-        } catch (e: IllegalArgumentException) {
-            result.error("INVALID_ARGUMENT", e.message ?: "Invalid payment", null)
-            return
-        }
-
+    private fun trackEvent(eventName: String, eventData: Map<String, Any>?, eventId: String?, result: Result) {
         pluginScope.launch {
             try {
-                val trackResult = if (eventPayment != null) {
-                    NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId, eventPayment)
-                } else {
-                    NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId)
-                }
+                val trackResult = NativeLinkRunner.getInstance().trackEvent(eventName, eventData, eventId)
                 
                 withContext(Dispatchers.Main) {
                     if (trackResult.isSuccess) {
@@ -360,22 +346,6 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 }
             }
         }
-    }
-
-    private fun toEventPayment(payment: Map<String, Any?>): EventPayment {
-        val amount = (payment["amount"] as? Number)?.toDouble()
-            ?: throw IllegalArgumentException("amount is required")
-        val paymentId = payment["paymentId"] as? String
-            ?: throw IllegalArgumentException("paymentId is required")
-        val currency = payment["currency"] as? String
-            ?: throw IllegalArgumentException("currency is required")
-        val userId = payment["userId"] as? String
-            ?: throw IllegalArgumentException("userId is required")
-        val status = (payment["status"] as? String)?.let { name ->
-            PaymentStatus.values().firstOrNull { it.name == name }
-                ?: throw IllegalArgumentException("Unknown payment status: $name")
-        } ?: PaymentStatus.PAYMENT_COMPLETED
-        return EventPayment(amount, paymentId, currency, userId, status)
     }
 
     private fun convertToNativeUserData(userData: Map<String, Any>): UserDataRequest {

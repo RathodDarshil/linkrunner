@@ -2,7 +2,6 @@ import 'dart:developer' as developer;
 
 import 'package:linkrunner/models/attribution_data.dart';
 import 'package:linkrunner/models/lr_consent.dart';
-import 'package:linkrunner/models/lr_event_payment.dart';
 import 'package:linkrunner/models/deeplink_data.dart';
 
 import 'constants.dart';
@@ -132,12 +131,11 @@ class LinkRunner {
 
   //  [eventId] - Optional event identifier. Accepts [String] or [num] (int/double).
   //  Numbers will be automatically converted to strings.
-  //  [payment] - Optional revenue; when set the event is stored as a payment named [eventName].
+  //  [eventData] - A payment when it holds amount, paymentId and currency (plus userId and optional status).
   Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
     Object? eventId,
-    EventPayment? payment,
   }) async {
     try {
       String? convertedEventId;
@@ -154,8 +152,7 @@ class LinkRunner {
       await LinkRunnerNativeBridge.trackEvent(
           eventName: eventName,
           eventData: eventData,
-          eventId: convertedEventId,
-          payment: payment);
+          eventId: convertedEventId);
 
       developer.log('Linkrunner: Event tracked successfully > $eventName');
 
@@ -169,29 +166,6 @@ class LinkRunner {
 
       rethrow;
     }
-  }
-
-  /// Track a payment; [eventName] becomes the payment type in reports and dashboard mappings.
-  Future<void> trackPayment({
-    required String eventName,
-    required String paymentId,
-    required String userId,
-    required double amount,
-    required String currency,
-    PaymentStatus status = PaymentStatus.PAYMENT_COMPLETED,
-    Map<String, dynamic>? eventData,
-  }) async {
-    await trackEvent(
-      eventName: eventName,
-      eventData: eventData,
-      payment: EventPayment(
-        amount: amount,
-        paymentId: paymentId,
-        currency: currency,
-        userId: userId,
-        status: status,
-      ),
-    );
   }
 
   /// Enable or disable PII (Personally Identifiable Information) hashing
