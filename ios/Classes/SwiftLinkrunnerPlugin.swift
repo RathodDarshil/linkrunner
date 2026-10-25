@@ -142,8 +142,9 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 } else {
                     try await LinkrunnerSDK.shared.initialize(token: token, disableIdfa: disableIdfa, debug: debug)
                 }
-                isInitialized = true
+                // Read on the main thread by every method call, so write it there too.
                 DispatchQueue.main.async {
+                    self.isInitialized = true
                     result(nil)
                 }
             } catch {
