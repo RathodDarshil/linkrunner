@@ -1,7 +1,9 @@
 import 'dart:developer' as developer;
 
 import 'package:linkrunner/models/attribution_data.dart';
+import 'package:linkrunner/models/lr_capture_payment.dart';
 import 'package:linkrunner/models/lr_consent.dart';
+import 'package:linkrunner/models/lr_remove_payment.dart';
 import 'package:linkrunner/models/deeplink_data.dart';
 
 import 'constants.dart';
@@ -126,6 +128,49 @@ class LinkRunner {
         error: e,
       );
       rethrow;
+    }
+  }
+
+  @Deprecated('Use trackEvent with amount, paymentId and currency in eventData')
+  Future<void> capturePayment({
+    // ignore: deprecated_member_use_from_same_package
+    required LRCapturePayment capturePayment,
+  }) async {
+    try {
+      // ignore: deprecated_member_use_from_same_package
+      await LinkRunnerNativeBridge.capturePayment(
+          capturePayment: capturePayment);
+
+      developer.log('Linkrunner: Payment captured successfully 💸');
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Payment captured failed',
+        name: packageName,
+        error: e,
+      );
+      return;
+    }
+  }
+
+  @Deprecated('Send the same paymentId with status PAYMENT_CANCELLED through trackEvent')
+  Future<void> removePayment({
+    // ignore: deprecated_member_use_from_same_package
+    required LRRemovePayment removePayment,
+  }) async {
+    try {
+      // ignore: deprecated_member_use_from_same_package
+      await LinkRunnerNativeBridge.removePayment(removePayment: removePayment);
+
+      return;
+    } catch (e) {
+      developer.log(
+        'Linkrunner: Payment removed failed',
+        name: packageName,
+        error: e,
+      );
+      return;
     }
   }
 

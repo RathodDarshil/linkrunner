@@ -1,6 +1,6 @@
 ## 5.0.0
 
-Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` are removed.
+Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` are deprecated.
 
 **Changed**
 
@@ -11,10 +11,11 @@ Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` ar
 - `PaymentStatus` is exported from `package:linkrunner/main.dart`.
 - Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.0.0` and iOS `LinkrunnerKit 5.0.0`.
 
-**Removed**
+**Deprecated**
 
-- `LinkRunner().capturePayment()`, `LinkRunner().removePayment()`, `LRCapturePayment`, `LRRemovePayment` and `PaymentType`. The `models/lr_capture_payment.dart` and `models/lr_remove_payment.dart` files are gone, so import `PaymentStatus` from `package:linkrunner/main.dart` instead.
-- `removePayment` has no replacement.
+- `LinkRunner().capturePayment()`, `LinkRunner().removePayment()`, `LRCapturePayment`, `LRRemovePayment` and `PaymentType`. They still work as before on the old endpoint and show a deprecation warning. They will be removed in a future major version.
+- `models/lr_capture_payment.dart` re-exports `PaymentStatus`, so existing imports keep working.
+- Instead of `removePayment`, send the same `paymentId` with `PaymentStatus.PAYMENT_CANCELLED` through `trackEvent`.
 
 **Migration**
 
