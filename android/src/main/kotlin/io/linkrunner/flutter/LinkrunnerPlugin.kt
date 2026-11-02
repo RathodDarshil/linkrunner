@@ -368,6 +368,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun capturePayment(userId: String, amount: Double, paymentId: String?, type: String, status: String, eventData: Map<String, Any>?, result: Result) {
         pluginScope.launch {
             try {
@@ -412,6 +413,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun removePayment(userId: String?, paymentId: String?, result: Result) {
         pluginScope.launch {
             try {

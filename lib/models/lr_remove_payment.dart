@@ -1,3 +1,4 @@
+@Deprecated('Send the same paymentId with status PAYMENT_CANCELLED through trackEvent')
 class LRRemovePayment {
   final String? paymentId;
   final String? userId;

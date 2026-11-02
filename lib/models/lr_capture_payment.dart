@@ -1,3 +1,8 @@
+import 'lr_payment_status.dart';
+
+export 'lr_payment_status.dart';
+
+@Deprecated('Pass the payment name as the trackEvent eventName, for example "FIRST_PAYMENT"')
 enum PaymentType {
   FIRST_PAYMENT,
   WALLET_TOPUP,
@@ -9,17 +14,12 @@ enum PaymentType {
   RECURRING,
 }
 
-enum PaymentStatus {
-  PAYMENT_INITIATED,
-  PAYMENT_COMPLETED,
-  PAYMENT_FAILED,
-  PAYMENT_CANCELLED,
-}
-
+@Deprecated('Use trackEvent with amount, paymentId and currency in eventData')
 class LRCapturePayment {
   final String paymentId;
   final String userId;
   final double amount;
+  // ignore: deprecated_member_use_from_same_package
   final PaymentType? type;
   final PaymentStatus? status;
   final Map<String, dynamic>? eventData;
@@ -42,6 +42,7 @@ class LRCapturePayment {
       'payment_id': paymentId,
       'user_id': userId,
       'amount': amount,
+      // ignore: deprecated_member_use_from_same_package
       'type': type?.name ?? PaymentType.DEFAULT_PAYMENT.name,
       'status': status?.name ?? PaymentStatus.PAYMENT_COMPLETED.name,
     };
