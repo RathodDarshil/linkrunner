@@ -1,15 +1,15 @@
 name: linkrunner
-description: "Flutter Package for linkrunner, track every click, download and dropoff for your app links"
+description: "Linkrunner mobile measurement partner (MMP) SDK for Flutter: install attribution, deferred deep linking, in-app events, revenue and SKAN for iOS and Android."
 version: 5.0.0
 homepage: "https://www.linkrunner.io/"
 repository: "https://github.com/RathodDarshil/linkrunner_flutter"
-documentation: "https://github.com/RathodDarshil/linkrunner_flutter#getting-started"
+documentation: "https://docs.linkrunner.io/sdk/flutter"
 topics:
-    - linkrunner
-    - app-attribution
-    - app-link-tracking
-    - app-tracking
-    - tracking
+    - attribution
+    - deep-linking
+    - mmp
+    - analytics
+    - marketing
 
 environment:
     sdk: ">=3.3.0 <4.0.0"
