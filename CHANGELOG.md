@@ -1,3 +1,58 @@
+## 5.0.0
+
+Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` are deprecated.
+
+**Changed**
+
+- `LinkRunner().trackEvent(eventName:, eventData:, eventId:)` keeps its signature and now also sends payments. When `eventData` has `amount`, `paymentId` and `currency`, the event is sent as a payment named `eventName`. Put `userId` (required; an empty string uses the user saved by `signup` or `setUserData`) and an optional `status` in `eventData` too. Every other key stays as event data.
+- `status` takes a `PaymentStatus` value or its name and defaults to `PAYMENT_COMPLETED`. Refund a payment by sending the same `paymentId` with `PaymentStatus.PAYMENT_CANCELLED`.
+- The native SDK checks the payment and throws a `PlatformException` before anything is sent when `paymentId` comes without `amount` or `currency`, `amount` is not a number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, `userId` is missing or `status` is not valid.
+- `amount` or `currency` without `paymentId` is a normal custom event, exactly as before.
+- `PaymentStatus` is exported from `package:linkrunner/main.dart`.
+- Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.0.0` and iOS `LinkrunnerKit 5.0.0`.
+
+**Deprecated**
+
+- `LinkRunner().capturePayment()`, `LinkRunner().removePayment()`, `LRCapturePayment`, `LRRemovePayment` and `PaymentType`. They still work as before on the old endpoint and show a deprecation warning. They will be removed in a future major version.
+- `models/lr_capture_payment.dart` re-exports `PaymentStatus`, so existing imports keep working.
+- Instead of `removePayment`, send the same `paymentId` with `PaymentStatus.PAYMENT_CANCELLED` through `trackEvent`.
+
+**Migration**
+
+Before:
+
+```dart
+await LinkRunner().capturePayment(
+  capturePayment: LRCapturePayment(
+    userId: 'user_123',
+    paymentId: 'order_456',
+    amount: 499.0,
+    type: PaymentType.FIRST_PAYMENT,
+    status: PaymentStatus.PAYMENT_COMPLETED,
+  ),
+);
+```
+
+After:
+
+```dart
+await LinkRunner().trackEvent(
+  eventName: 'FIRST_PAYMENT',
+  eventData: {
+    'amount': 499.0,
+    'paymentId': 'order_456',
+    'currency': 'INR',
+    'userId': 'user_123',
+    'status': PaymentStatus.PAYMENT_COMPLETED,
+  },
+);
+```
+
+Rename `capturePayment` to `trackEvent`, pass the old `type` as `eventName` with the exact same spelling, and move the fields into `eventData`. `currency` is new and required. If you called `capturePayment` without a `type` (or with `PaymentType.DEFAULT_PAYMENT`), use `eventName: 'DEFAULT'`.
+
+### Payment names and dashboard mappings
+
+The event name you pass becomes the payment type in reports and in your dashboard event mappings, and it is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before (for example `FIRST_PAYMENT` or `DEFAULT`), so your existing mappings, reports and partner templates keep working with no change. A different spelling such as `first_payment` is a new payment type. If you pick a new name such as `purchase`, add a mapping for it in the dashboard before you release, or those payments are not sent to ad networks. `capturePayment` without a type was stored as `DEFAULT`.
 ## 4.4.2
 
 - Bumped the bundled native iOS SDK to LinkrunnerKit 4.3.2. Fixes SKAdNetwork postbacks arriving with no conversion value on iOS 17.4 and above. LinkrunnerKit 4.1.0 to 4.3.1 called only `AdAttributionKit.Postback.updateConversionValue` on those versions, and Apple mirrors SKAdNetwork updates into AdAttributionKit but not the other way round, so installs from SKAdNetwork-signed networks such as Meta and Google got postbacks with no conversion value. 4.3.2 calls both `Postback.updateConversionValue` and `SKAdNetwork.updatePostbackConversionValue`. No Dart or API changes. Android is unchanged (android-sdk 4.4.0).
@@ -93,7 +148,6 @@
 ## 3.7.0
 
 - Added eventData parameter to capture payment method to support meta commerce event manager
-
 
 ## 3.6.3
 

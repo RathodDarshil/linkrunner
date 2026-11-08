@@ -13,7 +13,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '4.4.2';
+  final String packageVersion = '5.0.0';
 
   String? token;
 
@@ -74,10 +74,6 @@ class LinkRunner {
     required LRUserData userData,
     Map<String, dynamic>? data,
   }) async {
-    final customerUserId = userData.id;
-    if (customerUserId == null || customerUserId.isEmpty) {
-      throw ArgumentError.value(userData.id, 'userData.id', 'is required for signup');
-    }
     try {
       await LinkRunnerNativeBridge.signup(userData: userData, data: data);
 
@@ -95,10 +91,6 @@ class LinkRunner {
     }
   }
 
-  /// Sets user data for this install. Can be called right after `init`: `userData.id`
-  /// is optional, so you can pass only analytics ids (Mixpanel, Amplitude, PostHog, ...)
-  /// before your app knows the user. Linkrunner then sets its attribution properties on
-  /// those tools' profiles.
   Future<void> setUserData({
     required LRUserData userData,
   }) async {
@@ -139,10 +131,13 @@ class LinkRunner {
     }
   }
 
+  @Deprecated('Use trackEvent with amount, paymentId and currency in eventData')
   Future<void> capturePayment({
+    // ignore: deprecated_member_use_from_same_package
     required LRCapturePayment capturePayment,
   }) async {
     try {
+      // ignore: deprecated_member_use_from_same_package
       await LinkRunnerNativeBridge.capturePayment(
           capturePayment: capturePayment);
 
@@ -159,10 +154,13 @@ class LinkRunner {
     }
   }
 
+  @Deprecated('Send the same paymentId with status PAYMENT_CANCELLED through trackEvent')
   Future<void> removePayment({
+    // ignore: deprecated_member_use_from_same_package
     required LRRemovePayment removePayment,
   }) async {
     try {
+      // ignore: deprecated_member_use_from_same_package
       await LinkRunnerNativeBridge.removePayment(removePayment: removePayment);
 
       return;
@@ -176,9 +174,9 @@ class LinkRunner {
     }
   }
 
-
   //  [eventId] - Optional event identifier. Accepts [String] or [num] (int/double).
   //  Numbers will be automatically converted to strings.
+  //  [eventData] - A payment when it holds amount, paymentId and currency (plus userId and optional status).
   Future<void> trackEvent({
     required String eventName,
     Map<String, dynamic>? eventData,
@@ -197,7 +195,9 @@ class LinkRunner {
       }
       
       await LinkRunnerNativeBridge.trackEvent(
-          eventName: eventName, eventData: eventData, eventId: convertedEventId);
+          eventName: eventName,
+          eventData: eventData,
+          eventId: convertedEventId);
 
       developer.log('Linkrunner: Event tracked successfully > $eventName');
 

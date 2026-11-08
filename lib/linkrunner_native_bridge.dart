@@ -172,6 +172,14 @@ class LinkRunnerNativeBridge {
     }
   }
   
+  // PaymentStatus values cross the channel as their names.
+  static Map<String, dynamic> _bridgeEventData(Map<String, dynamic>? eventData) {
+    if (eventData == null) return {};
+    final status = eventData['status'];
+    if (status is! PaymentStatus) return eventData;
+    return {...eventData, 'status': status.name};
+  }
+
   /// Track custom event
   static Future<void> trackEvent({
     required String eventName,
@@ -182,7 +190,7 @@ class LinkRunnerNativeBridge {
     try {
       final Map<String, dynamic> arguments = {
         'eventName': eventName,
-        'eventData': eventData ?? {},
+        'eventData': _bridgeEventData(eventData),
       };
       // Only include eventId if it is provided
       if (eventId != null) {
@@ -198,8 +206,9 @@ class LinkRunnerNativeBridge {
     }
   }
   
-  /// Capture payment
+  @Deprecated('Use trackEvent with amount, paymentId and currency in eventData')
   static Future<void> capturePayment({
+    // ignore: deprecated_member_use_from_same_package
     required LRCapturePayment capturePayment,
   }) async {
     try {
@@ -207,6 +216,7 @@ class LinkRunnerNativeBridge {
         'userId': capturePayment.userId,
         'amount': capturePayment.amount,
         'paymentId': capturePayment.paymentId,
+        // ignore: deprecated_member_use_from_same_package
         'type': capturePayment.type?.name ?? PaymentType.DEFAULT_PAYMENT.name,
         'status': capturePayment.status?.name ?? PaymentStatus.PAYMENT_COMPLETED.name,
         'eventData': capturePayment.eventData,
@@ -221,8 +231,9 @@ class LinkRunnerNativeBridge {
     }
   }
   
-  /// Remove captured payment
+  @Deprecated('Send the same paymentId with status PAYMENT_CANCELLED through trackEvent')
   static Future<void> removePayment({
+    // ignore: deprecated_member_use_from_same_package
     required LRRemovePayment removePayment,
   }) async {
     try {
