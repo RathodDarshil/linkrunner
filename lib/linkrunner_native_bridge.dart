@@ -23,6 +23,7 @@ class LinkRunnerNativeBridge {
     bool debug, [
     String platform = 'FLUTTER',
     String? packageVersion,
+    bool? privacyMode,
   ]) async {
     try {
       final Map<String, dynamic> arguments = {
@@ -40,6 +41,11 @@ class LinkRunnerNativeBridge {
       // iOS uses disableIdfa
       if (disableIdfa != null) {
         arguments['disableIdfa'] = disableIdfa;
+      }
+      // Omit privacyMode when null so native keeps its stored value.
+      // Sending false would turn a stored true off.
+      if (privacyMode != null) {
+        arguments['privacyMode'] = privacyMode;
       }
       // Provide SDK platform and version so Android can call configureSDK before init
       arguments['platform'] = platform;

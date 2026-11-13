@@ -47,8 +47,10 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                 val debug = call.argument<Boolean>("debug") ?: false
                 val platform = call.argument<String>("platform") ?: "FLUTTER"
                 val packageVersion = call.argument<String>("packageVersion")
+                // Absent or null keeps the stored value on the native side.
+                val privacyMode = call.argument<Boolean>("privacyMode")
                 if (token != null) {
-                    initNativeSDK(token, secretKey, keyId, debug, platform, packageVersion, result)
+                    initNativeSDK(token, secretKey, keyId, debug, platform, packageVersion, privacyMode, result)
                 } else {
                     result.error("INVALID_ARGUMENT", "Token is required", null)
                 }
@@ -173,6 +175,7 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
         debug: Boolean,
         platform: String,
         packageVersion: String?,
+        privacyMode: Boolean?,
         result: Result
     ) {
         pluginScope.launch {
@@ -194,9 +197,9 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
 
                 // Call appropriate init method based on available parameters
                 val initResult = if (secretKey != null && keyId != null) {
-                    linkRunner.init(context, token, secretKey = secretKey, keyId = keyId, debug = debug)
+                    linkRunner.init(context, token, secretKey = secretKey, keyId = keyId, debug = debug, privacyMode = privacyMode)
                 } else {
-                    linkRunner.init(context, token, debug = debug)
+                    linkRunner.init(context, token, debug = debug, privacyMode = privacyMode)
                 }
 
                 android.util.Log.d("LinkRunner", "Init result: $initResult")
