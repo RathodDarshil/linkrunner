@@ -13,7 +13,7 @@ import 'models/lr_user_data.dart';
 class LinkRunner {
   static final LinkRunner _singleton = LinkRunner._internal();
 
-  final String packageVersion = '5.0.0';
+  final String packageVersion = '5.1.0';
 
   String? token;
 
@@ -41,10 +41,18 @@ class LinkRunner {
   /// [keyId] - Optional key ID for SDK signature
   /// [disableIdfa] - Disable IDFA collection on iOS (default: false)
   /// [debug] - Enable debug mode (default: false)
+  /// [privacyMode] - Stop collecting every device-level identifier (advertising IDs,
+  /// IDFV, Android ID, App Set ID, local IP, carrier). Use it for apps directed at
+  /// children. `true` stays on across launches until you pass `false`. Leave it
+  /// null to keep the stored value (default: off).
   /// 
   /// Note: To disable AAID collection on Android, use setDisableAaidCollection() method
   Future<void> init(String token,
-      [String? secretKey, String? keyId, bool disableIdfa = false, bool debug = false]) async {
+      [String? secretKey,
+      String? keyId,
+      bool disableIdfa = false,
+      bool debug = false,
+      bool? privacyMode]) async {
     if (token.isEmpty) {
       developer.log(
         'Linkrunner needs your project token to initialize!',
@@ -64,6 +72,7 @@ class LinkRunner {
         debug,
         'FLUTTER',
         packageVersion,
+        privacyMode,
       );
     } catch (e) {
       developer.log('Failed to initialize SDK: $e');

@@ -1,3 +1,15 @@
+## 5.1.0
+
+**Added**
+
+- `privacyMode` init parameter: `LinkRunner().init(token, secretKey, keyId, disableIdfa, debug, privacyMode)`. Pass `true` to stop collecting every device-level identifier. Only the SDK-generated install instance ID identifies the install. Use it for apps directed at children (COPPA, Apple Kids Category, Google Play Families).
+  - Android: no GAID, no App Set ID, no Android ID, no local IP, no carrier name and no Meta install referrer.
+  - iOS: no IDFA, the ATT prompt is never shown, no IDFV, the device name is replaced by the generic model, no Google ODM and no SKAdNetwork conversion values.
+  - Still sent: install instance ID, device metadata (brand, model, OS version, locale, connectivity), the Google Play install referrer on Android and the Apple AdServices token on iOS. Data your app passes through `signup`, `setUserData`, `setPushToken` or `setAdditionalData` is still sent.
+  - `true` stays on across launches until you call `init` with `false`. Leaving it out (null) keeps the stored value. Default is off.
+  - Trade-off: Google iOS match rates drop, because IDFV is Google's fallback ID. Server-side IP matching still works.
+- Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.1.0` and iOS `LinkrunnerKit 5.1.0`.
+
 ## 5.0.0
 
 Payments are now sent with `trackEvent`. `capturePayment` and `removePayment` are deprecated.

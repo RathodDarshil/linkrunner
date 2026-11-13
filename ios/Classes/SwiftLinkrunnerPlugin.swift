@@ -23,7 +23,9 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
                 let keyId = args["keyId"] as? String
                 let disableIdfa = args["disableIdfa"] as? Bool
                 let debug = args["debug"] as? Bool ?? false
-                initNativeSDK(token: token, secretKey: secretKey, keyId: keyId, disableIdfa: disableIdfa, debug: debug, result: result)
+                // Absent or NSNull gives nil, which keeps the stored value natively.
+                let privacyMode = args["privacyMode"] as? Bool
+                initNativeSDK(token: token, secretKey: secretKey, keyId: keyId, disableIdfa: disableIdfa, debug: debug, privacyMode: privacyMode, result: result)
             } else {
                 result(FlutterError(code: "INVALID_ARGUMENT", message: "Token is required", details: nil))
             }
@@ -133,14 +135,14 @@ public class SwiftLinkrunnerPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func initNativeSDK(token: String, secretKey: String?, keyId: String?, disableIdfa: Bool?, debug: Bool, result: @escaping FlutterResult) {
+    private func initNativeSDK(token: String, secretKey: String?, keyId: String?, disableIdfa: Bool?, debug: Bool, privacyMode: Bool?, result: @escaping FlutterResult) {
         Task {
             do {
                 // Call appropriate init method based on available parameters
                 if let secretKey = secretKey, let keyId = keyId {
-                    try await LinkrunnerSDK.shared.initialize(token: token, secretKey: secretKey, keyId: keyId, disableIdfa: disableIdfa, debug: debug)
+                    try await LinkrunnerSDK.shared.initialize(token: token, secretKey: secretKey, keyId: keyId, disableIdfa: disableIdfa, debug: debug, privacyMode: privacyMode)
                 } else {
-                    try await LinkrunnerSDK.shared.initialize(token: token, disableIdfa: disableIdfa, debug: debug)
+                    try await LinkrunnerSDK.shared.initialize(token: token, disableIdfa: disableIdfa, debug: debug, privacyMode: privacyMode)
                 }
                 // Read on the main thread by every method call, so write it there too.
                 DispatchQueue.main.async {
