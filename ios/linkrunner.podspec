@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name             = 'linkrunner'
   # Keep in step with pubspec.yaml — these drifted apart previously (pubspec 4.0.1
   # against podspec 3.4.0).
-  s.version          = '5.1.0'
+  s.version          = '5.2.0'
   s.summary          = 'Linkrunner MMP SDK for Flutter: install attribution, deferred deep linking, in-app events, revenue and SKAN.'
   s.description      = <<-DESC
 Flutter Package for linkrunner.io - Advanced app attribution and link tracking service. 
@@ -15,7 +15,7 @@ user event tracking, and payment analytics for Flutter applications.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'LinkrunnerKit', '5.1.0'
+  s.dependency 'LinkrunnerKit', '5.2.0'
   s.platform = :ios, '15.0'
   s.swift_version = '5.9'
 
