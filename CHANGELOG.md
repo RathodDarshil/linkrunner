@@ -1,3 +1,12 @@
+## 5.2.0
+
+**Added**
+
+- The SDK now reads the Meta (Facebook) SDK's anonymous ID when your app bundles the Meta SDK (for example through `facebook_app_events`), and sends it with `init`, `signup`, `trackEvent` and `capturePayment`. The backend forwards it to Meta as `anon_id`, so Meta can match the events Linkrunner sends to the device its own SDK already knows. No app code changes and no new dependency: apps without the Meta SDK send exactly what they sent before.
+- The lookup is read only, works in any start-up order, and is skipped while `privacyMode` is on.
+- Opt out at build time: `<meta-data android:name="io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled" android:value="false" />` in `AndroidManifest.xml`, and a `LinkrunnerMetaAnonymousIdCollectionEnabled` Boolean set to `NO` in `Info.plist`.
+- Requires the bundled native SDKs Android `io.linkrunner:android-sdk:5.2.0` and iOS `LinkrunnerKit 5.2.0`.
+
 ## 5.1.0
 
 **Added**
