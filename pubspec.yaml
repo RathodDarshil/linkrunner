@@ -1,6 +1,6 @@
 name: linkrunner
 description: "Linkrunner mobile measurement partner (MMP) SDK for Flutter: install attribution, deferred deep linking, in-app events, revenue and SKAN for iOS and Android."
-version: 5.1.0
+version: 5.2.0
 homepage: "https://www.linkrunner.io/"
 repository: "https://github.com/RathodDarshil/linkrunner_flutter"
 documentation: "https://docs.linkrunner.io/sdk/flutter"
