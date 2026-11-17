@@ -7,6 +7,7 @@
 **Fixed**
 
 - Release builds no longer write the project token or user details (name, email, phone) to logcat or the console. The native SDKs log only when debug is on, and mask those values even then.
+- The Android plugin no longer logs the full init response, which included attribution and deep link data.
 
 ## 5.2.0
 

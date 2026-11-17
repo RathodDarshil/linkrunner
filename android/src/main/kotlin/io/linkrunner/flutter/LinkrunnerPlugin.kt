@@ -202,11 +202,6 @@ class LinkrunnerPlugin: FlutterPlugin, MethodCallHandler {
                     linkRunner.init(context, token, debug = debug, privacyMode = privacyMode)
                 }
 
-                android.util.Log.d("LinkRunner", "Init result: $initResult")
-                android.util.Log.d("LinkRunner", "Is success: ${initResult.isSuccess}")
-                initResult.onSuccess { response ->
-                    android.util.Log.d("LinkRunner", "Init response: $response")
-                }
                 initResult.onFailure { error ->
                     android.util.Log.e("LinkRunner", "Init failed", error)
                 }
