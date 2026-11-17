@@ -6,6 +6,8 @@
 
 **Fixed**
 
+- Android: a tracked event or payment keeps the user id from when it was tracked, so events still waiting to be sent are no longer sent under a user who signed in later.
+- Android: sending no longer slows to about 1 request every 2 seconds while the app's main thread is busy.
 - Release builds no longer write the project token or user details (name, email, phone) to logcat or the console. The native SDKs log only when debug is on, and mask those values even then.
 - The Android plugin no longer logs the full init response, which included attribution and deep link data.
 
