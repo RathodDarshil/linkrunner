@@ -1,3 +1,13 @@
+## 5.3.0
+
+**Changed**
+
+- Bundles native Android SDK `io.linkrunner:android-sdk:5.3.0` and iOS SDK `LinkrunnerKit 5.3.0`. Requests are saved to an on-device queue and sent in order while the app runs, so they survive the app being killed or going offline. On Android this replaces one WorkManager job per call, which could start the app in the background and cause ANRs. Run a clean native build after upgrading.
+
+**Fixed**
+
+- Release builds no longer write the project token or user details (name, email, phone) to logcat or the console. The native SDKs log only when debug is on, and mask those values even then.
+
 ## 5.2.0
 
 **Added**
