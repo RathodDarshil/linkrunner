@@ -1,3 +1,10 @@
+## 5.3.1
+
+**Added**
+
+- iOS: the bundled `LinkrunnerKit` is now 5.3.1, which ships a privacy manifest (`PrivacyInfo.xcprivacy`). Xcode's privacy report for your app now lists Linkrunner's collected data types and its `UserDefaults` use, so you no longer need to declare them by hand. Run `pod install` after upgrading.
+- Android is unchanged (`io.linkrunner:android-sdk:5.3.0`).
+
 ## 5.3.0
 
 **Changed**
