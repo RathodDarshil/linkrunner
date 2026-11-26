@@ -1,3 +1,11 @@
+## 5.3.2
+
+**Changed**
+
+- Native SDKs bumped to `io.linkrunner:android-sdk:5.3.1` and `LinkrunnerKit` 5.3.2. `getAttributionData` and `handleDeeplink` no longer wait up to 5 seconds for init to be sent on a new install, so attribution and deferred deeplinks arrive sooner on the first launch.
+- On iOS, a native call made before init now waits up to 10 seconds for it instead of failing, the same as on Android.
+- No API changes. Run `pod install` after upgrading.
+
 ## 5.3.1
 
 **Added**
